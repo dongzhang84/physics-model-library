@@ -12,6 +12,9 @@ __pycache__/
 venv/
 env/
 
+# Local-only render artifacts (keep the GIF; never upload MP4s)
+*.mp4
+
 # OS
 .DS_Store
 Thumbs.db

@@ -8,9 +8,11 @@ the full time evolution as a movie:
   BOT  — NON-integrable control (linear dispersion): the same 4 pulses smear
          and delocalize; the symbols are lost.
 
-Outputs soliton_channel.gif — palette-optimized (~1 MB) so it embeds and
-auto-plays in the README. Renders a temporary mp4 as an intermediate and
-deletes it (we do not keep an mp4). Requires ffmpeg on PATH.
+Outputs two files (ffmpeg required on PATH):
+  - soliton_channel.mp4 — crisp full-quality movie (kept locally; git-ignored,
+    NOT uploaded — see .gitignore `*.mp4`).
+  - soliton_channel.gif — palette-optimized (~1 MB), embedded & auto-playing in
+    the README (this one is committed).
 Does not touch soliton_channel.py or soliton_channel_demo.png.
 """
 
@@ -101,17 +103,17 @@ def draw(i):
 
 anim = FuncAnimation(fig, draw, frames=len(kdv_frames), interval=40, blit=False)
 
-# Render a temporary high-quality mp4, then convert to a palette-optimized GIF
-# via ffmpeg (much smaller than a direct pillow GIF for this busy content).
-tmp_mp4 = os.path.join(tempfile.gettempdir(), "soliton_channel_tmp.mp4")
-pal     = os.path.join(tempfile.gettempdir(), "soliton_palette.png")
-anim.save(tmp_mp4, writer=FFMpegWriter(fps=25, bitrate=2400), dpi=130)
+# Render the full-quality mp4 (kept locally), then convert to a
+# palette-optimized GIF via ffmpeg (much smaller than a direct pillow GIF).
+anim.save("soliton_channel.mp4", writer=FFMpegWriter(fps=25, bitrate=2400), dpi=130)
+print("saved soliton_channel.mp4  (local only; git-ignored)")
 
+pal = os.path.join(tempfile.gettempdir(), "soliton_palette.png")
 vf = "fps=10,scale=560:-1:flags=lanczos"
-subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp_mp4,
+subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", "soliton_channel.mp4",
                 "-vf", f"{vf},palettegen=stats_mode=diff", pal], check=True)
-subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp_mp4, "-i", pal,
+subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", "soliton_channel.mp4", "-i", pal,
                 "-lavfi", f"{vf}[x];[x][1:v]paletteuse=dither=none",
                 "soliton_channel.gif"], check=True)
-os.remove(tmp_mp4); os.remove(pal)
+os.remove(pal)
 print("saved soliton_channel.gif")
