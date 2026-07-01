@@ -18,6 +18,29 @@
 
 ## 结构
 
+```
+integrable_reversible/
+├── README.md              ← 本文件:项目门面
+├── proposal.md            ← 研究总纲(动机 / 技术方案 / benchmark / 相关工作)
+│
+├── demos/                 ← 已完成的前置实验(存档)
+│   ├── soliton_channel/       孤立子无串扰信道(标准一,动机/铺垫)
+│   └── box_ball_system/       箱球系统 vs Transformer(标准二,上界预览)
+│
+├── data/                  ← §4 三类 benchmark 生成器
+│   ├── reversible_systems/    ①主战场:BBS / Margolus CA / Toda
+│   └── synthetic/             ②半合成:模运算 / 可逆电路 / 括号配平
+│
+├── models/                ← §2 核心图上的三条线
+│   ├── integrable_exact/      路线A:硬编可积(BBS),理想上界
+│   ├── reversible_net/        路线C:可逆coupling + 可学F,★主角
+│   └── transformer/           baseline:下界
+│
+├── eval/                  ← §3 核心图 + 四诊断(准确率/守恒漂移/可逆误差/孤立子可视化)
+├── experiments/           ← 训练脚本 + configs(把 data×model×eval 串起来复现结果)
+└── paper/                 ← 论文草稿 + figure
+```
+
 | 目录 | 内容 | 对应 proposal |
 |---|---|---|
 | [`proposal.md`](proposal.md) | 研究总纲 | 全篇 |
