@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-01 06:59 UTC  
+**Generated:** 2026-07-01 07:39 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -10,12 +10,12 @@
 | Stat | Value |
 |------|-------|
 | Status | ❌ Stalled |
-| Active days | 1 / 7 |
-| Total commits | 7 |
+| Active days | 2 / 7 |
+| Total commits | 8 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **1** | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -26,6 +26,10 @@
 - `140c126` docs: move integrable-specific content from root README into the project — _dongzhang84_ `2026-06-30 23:00`
 - `4c9e96a` docs: add visual directory tree to integrable_reversible README — _dongzhang84_ `2026-06-30 21:19`
 - `f47dff3` restructure: demos_1 → integrable_reversible research project — _dongzhang84_ `2026-06-30 17:38`
+
+**Wed – Wednesday, Jul 1**
+
+- `6da22d1` docs: rewrite soliton-channel README for non-experts — _dongzhang84_ `2026-07-01 00:39`
 
 ---
 
