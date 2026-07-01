@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-01 00:38 UTC  
+**Generated:** 2026-07-01 04:19 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,14 +11,15 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 1 / 7 |
-| Total commits | 1 |
+| Total commits | 2 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **1** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| ⚪ | **2** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
+- `4c9e96a` docs: add visual directory tree to integrable_reversible README — _dongzhang84_ `2026-06-30 21:19`
 - `f47dff3` restructure: demos_1 → integrable_reversible research project — _dongzhang84_ `2026-06-30 17:38`
 
 ---
