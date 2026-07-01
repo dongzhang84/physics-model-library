@@ -27,7 +27,7 @@
 
 ## 二、标准一：可积系统干一件 AI 活——无串扰多符号信道
 
-![标准一：孤立子信道](soliton_channel_demo.png)
+![标准一：孤立子信道](soliton_channel/soliton_channel_demo.png)
 
 ### 任务
 
@@ -54,7 +54,7 @@ KdV 方程 `u_t + 6 u u_x + u_xxx = 0` 的孤立子。符号→振幅（孤立�
 
 ## 三、标准二：可积结构在超训练长度上赢 Transformer——箱球系统
 
-![标准二：箱球系统 vs Transformer](bbs_standard2_demo.png)
+![标准二：箱球系统 vs Transformer](box_ball_system/bbs_standard2_demo.png)
 
 ### 引擎：箱球系统（Box-Ball System, BBS）
 

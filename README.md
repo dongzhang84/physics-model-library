@@ -63,18 +63,18 @@ By contrast: Hamiltonian networks give only approximate energy conservation and 
 
 Encode four abstract symbols `[3, 1, 2, 0]` as four KdV solitons of different heights, send them down a *single* channel, let them collide in transit, and read all four back at the far end. The data is abstract symbols; nothing about the task is physical.
 
-![Soliton channel](demos_1/standard1_soliton_channel/soliton_channel_demo.png)
+![Soliton channel](integrable_reversible/demos/soliton_channel/soliton_channel_demo.png)
 
 - **Integrable engine (top):** the solitons collide and separate with shape and height untouched → all four symbols decoded.
 - **Non-integrable control (bottom, pure linear dispersion):** the same symbols smear into noise → symbols lost.
 
-Same AI task, the integrable engine does it and the non-integrable one cannot → the integrable cell lights up. **Honest boundary:** this shows *structure can do it*, not yet an engineered, trainable, benchmarked model — and attention routes multiplexed information fairly well too, so this is Bar 1, not Bar 2. → [details](demos_1/standard1_soliton_channel/README.md)
+Same AI task, the integrable engine does it and the non-integrable one cannot → the integrable cell lights up. **Honest boundary:** this shows *structure can do it*, not yet an engineered, trainable, benchmarked model — and attention routes multiplexed information fairly well too, so this is Bar 1, not Bar 2. → [details](integrable_reversible/demos/soliton_channel/README.md)
 
 ### Demo 2 — Box-Ball System vs Transformer · Bar 2
 
 The Box-Ball System (BBS) is the ultradiscrete limit of KdV — an integrable cellular automaton. Task: given a 0/1 state, predict its state several steps later. We train a small Transformer (3 layers, d=64, sinusoidal positions) **only on length L=32**, then test on lengths 48 / 64 / 96 / 128 — out of distribution by length alone (soliton size and density held fixed across lengths).
 
-![Box-Ball System vs Transformer](demos_1/standard2_box_ball_system/bbs_standard2_demo.png)
+![Box-Ball System vs Transformer](integrable_reversible/demos/box_ball_system/bbs_standard2_demo.png)
 
 | Lattice length | Transformer per-cell accuracy | Transformer conserved ball-count | Integrable engine |
 |---|---|---|---|
@@ -92,7 +92,7 @@ Honest boundaries, three of them:
 2. "Recurrent / structured models extrapolate in length better than Transformers" overlaps existing literature (see CATALOG). Integrable's *exclusive* contribution is the "exact conservation + exact reversibility" line.
 3. Toy task, a few minutes on CPU. Turning this into publishable evidence means scaling up, adding stronger baselines, and designing tasks that demand *both* nonlinearity and exact conservation.
 
-→ [details](demos_1/standard2_box_ball_system/README.md)
+→ [details](integrable_reversible/demos/box_ball_system/README.md)
 
 ## What is and isn't novel here
 
@@ -109,14 +109,14 @@ The collisions are all at the level of parts; nothing collides at the level of t
 - **[MANIFESTO.md](MANIFESTO.md)** — why this project exists, the two acceptance bars, why integrable systems first.
 - **[CATALOG.md](CATALOG.md)** — the mining map (full cross-tables) and a candid related-work map.
 - **[docs/](docs/)** — the long-form proposal: physics methodology as the foundation for the next fifty years of AI.
-- **[demos_1/](demos_1/)** — runnable demos (Python plus figures).
+- **[integrable_reversible/](integrable_reversible/)** — the first mined family: the integrable & reversible systems research project (proposal, finished demos, and the in-progress paper).
 
 ```bash
 # Demo 1 — soliton channel
-cd demos_1/standard1_soliton_channel && pip install numpy matplotlib && python soliton_channel.py
+cd integrable_reversible/demos/soliton_channel && pip install numpy matplotlib && python soliton_channel.py
 
 # Demo 2 — box-ball system vs Transformer (CPU is enough)
-cd demos_1/standard2_box_ball_system && pip install torch numpy matplotlib && python box_ball_system.py
+cd integrable_reversible/demos/box_ball_system && pip install torch numpy matplotlib && python box_ball_system.py
 ```
 
 **Status:** early. The map is a draft and the demos are toy-scale. The catalog is meant to be a living document — corrections, additions, and claims on any 🔴 cell are welcome.
