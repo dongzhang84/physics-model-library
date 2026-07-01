@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-01 07:39 UTC  
+**Generated:** 2026-07-01 23:43 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 8 |
+| Total commits | 9 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **1** | ⚪ | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **2** | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -29,6 +29,7 @@
 
 **Wed – Wednesday, Jul 1**
 
+- `089a785` docs: add the real motivation for demo 1 (attention is lossy; solitons aren't) — _dongzhang84_ `2026-07-01 16:43`
 - `6da22d1` docs: rewrite soliton-channel README for non-experts — _dongzhang84_ `2026-07-01 00:39`
 
 ---
