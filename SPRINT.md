@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-01 06:12 UTC  
+**Generated:** 2026-07-01 06:18 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,14 +11,15 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 1 / 7 |
-| Total commits | 5 |
+| Total commits | 6 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **5** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| ⚪ | **6** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
+- `51dbd2a` Revert "ci: skip playbook dispatch gracefully when PLAYBOOK_TOKEN is unset" — _dongzhang84_ `2026-06-30 23:18`
 - `f0302d2` ci: trigger run to verify notify-playbook skips cleanly — _dongzhang84_ `2026-06-30 23:12`
 - `bf0785b` ci: skip playbook dispatch gracefully when PLAYBOOK_TOKEN is unset — _dongzhang84_ `2026-06-30 23:11`
 - `140c126` docs: move integrable-specific content from root README into the project — _dongzhang84_ `2026-06-30 23:00`
