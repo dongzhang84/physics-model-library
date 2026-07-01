@@ -1,67 +1,124 @@
-# 可积 / 可逆系统 · Integrable & Reversible Systems
+# Integrable & Reversible Systems
 
-> Physics Model Library 里 🔴「可积系统」这一格的完整研究项目。
-> 目标：一篇能进 `cond-mat.dis-nn` / `nlin.SI` 的 research paper。
+> The first mined family of the [Physics Model Library](../README.md): the 🔴 *integrable systems* cell, promoted from a demo folder into a full research project.
+> Goal: a research paper for `cond-mat.dis-nn` / `nlin.SI`.
 
-## 主张（一句话）
+## The claim (one sentence)
 
-**一个真正训练出来、带可积/可逆结构（归纳偏置）的神经网络，在为该结构适配的一类任务上显著优于 Transformer，并额外白送精确可逆与守恒——它靠学习逼近硬编可积的理想上界。**
+**A genuinely *trained* neural network that carries integrable/reversible structure as an inductive bias beats a Transformer on the class of tasks that structure fits, and throws in exact reversibility and conservation for free — approaching the hard-coded integrable ideal, but reaching it by learning.**
 
-完整动机、技术方案、benchmark 策略、相关工作见 **[proposal.md](proposal.md)**。
+Full motivation, technical plan, benchmark strategy, and related work: **[proposal.md](proposal.md)**.
 
-## 现状
+## Why integrable systems first
 
-- ✅ **前置实验（已完成）**：两个最小 demo，见 [`demos/`](demos/)。
-  - `soliton_channel/` — 孤立子无串扰信道（标准一，论文的动机/铺垫）。
-  - `box_ball_system/` — 箱球系统 vs Transformer 长度外推（标准二，路线 A 理想上界的预览）。
-- 🚧 **主研究（进行中）**：补上缺的一环——一个可学习 + 结构可逆的网络（路线 C）。见下方结构。
+Integrable systems sit in a 🔴 near-empty zone, and they have a temperament unique in all of physics:
 
-## 结构
+> **Infinitely many exact conserved quantities + full time-reversibility + never chaotic + exactly solvable by the inverse scattering transform.**
+
+They can push a *nonlinear* system forward arbitrarily far and rewind it exactly, without losing a single bit. Their signature is the **soliton**: two waves collide, pass through each other, and come out with their shapes perfectly intact, off by only a phase shift.
+
+By contrast: Hamiltonian networks give only approximate energy conservation and can go chaotic; linear state-space models are structurally too weak; a Transformer's learned conservation is approximate and drifts as sequences grow. **Only integrable systems hold nonlinear + exactly reversible + exactly conserved + non-chaotic all at once.** Bar 2 is staked on that combination.
+
+## Status
+
+- ✅ **Preliminary experiments (done)** — two minimal demos in [`demos/`](demos/).
+  - `soliton_channel/` — crosstalk-free soliton channel (Bar 1; the paper's motivation / setup).
+  - `box_ball_system/` — Box-Ball System vs Transformer length extrapolation (Bar 2; a preview of the Route A upper bound).
+- 🚧 **Main research (in progress)** — the missing link: a genuinely *trained* network with structural reversibility (Route C). See the structure below.
+
+## Structure
 
 ```
 integrable_reversible/
-├── README.md              ← 本文件:项目门面
-├── proposal.md            ← 研究总纲(动机 / 技术方案 / benchmark / 相关工作)
+├── README.md              ← this file: the project's front door
+├── proposal.md            ← the research plan (motivation / method / benchmarks / related work)
 │
-├── demos/                 ← 已完成的前置实验(存档)
-│   ├── soliton_channel/       孤立子无串扰信道(标准一,动机/铺垫)
-│   └── box_ball_system/       箱球系统 vs Transformer(标准二,上界预览)
+├── demos/                 ← finished preliminary experiments (archive)
+│   ├── soliton_channel/       crosstalk-free soliton channel (Bar 1, motivation)
+│   └── box_ball_system/       Box-Ball System vs Transformer (Bar 2, upper-bound preview)
 │
-├── data/                  ← §4 三类 benchmark 生成器
-│   ├── reversible_systems/    ①主战场:BBS / Margolus CA / Toda
-│   └── synthetic/             ②半合成:模运算 / 可逆电路 / 括号配平
+├── data/                  ← §4 generators for the three benchmark classes
+│   ├── reversible_systems/    (1) main: BBS / Margolus CA / Toda lattice
+│   └── synthetic/             (2) semi-synthetic: modular arithmetic / reversible circuits / brackets
 │
-├── models/                ← §2 核心图上的三条线
-│   ├── integrable_exact/      路线A:硬编可积(BBS),理想上界
-│   ├── reversible_net/        路线C:可逆coupling + 可学F,★主角
-│   └── transformer/           baseline:下界
+├── models/                ← §2 the three lines on the money plot
+│   ├── integrable_exact/      Route A: hard-coded integrable (BBS), ideal upper bound
+│   ├── reversible_net/        Route C: reversible coupling net + learned F — ★ main model
+│   └── transformer/           baseline: lower bound
 │
-├── eval/                  ← §3 核心图 + 四诊断(准确率/守恒漂移/可逆误差/孤立子可视化)
-├── experiments/           ← 训练脚本 + configs(把 data×model×eval 串起来复现结果)
-└── paper/                 ← 论文草稿 + figure
+├── eval/                  ← §3 money plot + four diagnostics (accuracy / conservation drift / reversibility / soliton viz)
+├── experiments/           ← training scripts + configs (wire data × model × eval to reproduce results)
+└── paper/                 ← manuscript draft + figures
 ```
 
-| 目录 | 内容 | 对应 proposal |
+| Path | What | proposal § |
 |---|---|---|
-| [`proposal.md`](proposal.md) | 研究总纲 | 全篇 |
-| [`demos/`](demos/) | 已完成的前置实验（存档） | §1 现状 |
-| `data/` | 三类 benchmark 的数据生成器 | §4 |
-| `models/` | 那张核心图上的三条线（见下） | §2 |
-| `eval/` | 核心图 + 四个诊断指标 | §3 |
-| `experiments/` | 训练脚本 + configs（把 data×model×eval 串起来复现结果） | §2 执行步骤 |
-| `paper/` | 论文草稿 + figure | — |
+| [`proposal.md`](proposal.md) | research plan | whole |
+| [`demos/`](demos/) | finished preliminary experiments (archive) | §1 |
+| `data/` | generators for the three benchmark classes | §4 |
+| `models/` | the three lines on the money plot (below) | §2 |
+| `eval/` | money plot + four diagnostics | §3 |
+| `experiments/` | training scripts + configs (reproduce results) | §2 steps |
+| `paper/` | manuscript draft + figures | — |
 
-**`models/` 三条线**：
-- `integrable_exact/` — 路线 A：硬编可积（BBS），理想上界（天花板）。
-- `reversible_net/` — 路线 C：可逆 coupling 网络 + 可学碰撞算子 F，**本文主角**。
-- `transformer/` — baseline：下界（超训练长度即崩、破坏守恒）。
+**`models/` — the three lines:**
+- `integrable_exact/` — **Route A**: hard-coded integrable (BBS), the ideal upper bound (ceiling).
+- `reversible_net/` — **Route C**: reversible coupling net + learned collision operator F. **The main model.**
+- `transformer/` — **baseline**: lower bound (collapses past training length, breaks conservation).
 
-## 复现前置实验
+## Demos
+
+### Demo 1 — Soliton channel · Bar 1
+
+Encode four abstract symbols `[3, 1, 2, 0]` as four KdV solitons of different heights, send them down a *single* channel, let them collide in transit, and read all four back at the far end. The data is abstract symbols; nothing about the task is physical.
+
+![Soliton channel](demos/soliton_channel/soliton_channel_demo.png)
+
+- **Integrable engine (top):** the solitons collide and separate with shape and height untouched → all four symbols decoded.
+- **Non-integrable control (bottom, pure linear dispersion):** the same symbols smear into noise → symbols lost.
+
+Same AI task, the integrable engine does it and the non-integrable one cannot → the integrable cell lights up. **Honest boundary:** this shows *structure can do it*, not yet an engineered, trainable, benchmarked model — and attention routes multiplexed information fairly well too, so this is Bar 1, not Bar 2. → [details](demos/soliton_channel/README.md)
+
+### Demo 2 — Box-Ball System vs Transformer · Bar 2
+
+The Box-Ball System (BBS) is the ultradiscrete limit of KdV — an integrable cellular automaton. Task: given a 0/1 state, predict its state several steps later. We train a small Transformer (3 layers, d=64, sinusoidal positions) **only on length L=32**, then test on lengths 48 / 64 / 96 / 128 — out of distribution by length alone (soliton size and density held fixed across lengths).
+
+![Box-Ball System vs Transformer](demos/box_ball_system/bbs_standard2_demo.png)
+
+| Lattice length | Transformer per-cell accuracy | Transformer conserved ball-count | Integrable engine |
+|---|---|---|---|
+| 32 (train) | 94.2% | 20.0% | 100% / 100% |
+| 48 | 83.6% | 0.0% | 100% / 100% |
+| 64 | 81.6% | 0.0% | 100% / 100% |
+| 96 | 81.7% | 0.0% | 100% / 100% |
+| 128 | 81.0% | 0.0% | 100% / 100% |
+
+The integrable engine is exact, conserved, and **bit-perfectly reversible** at every length; the trained Transformer collapses past its training length and destroys the conserved quantity. **Structure beats scale, on the out-of-distribution length that is the Transformer's acknowledged blind spot.**
+
+Honest boundaries, three of them:
+
+1. The integrable rule is *built in* (it is the ground-truth generator), so 100% is "structure by construction," not "learned better." What the demo shows is that an integrable inductive bias extrapolates where pure learning does not.
+2. "Recurrent / structured models extrapolate in length better than Transformers" overlaps existing literature (see [../CATALOG.md](../CATALOG.md)). Integrable's *exclusive* contribution is the "exact conservation + exact reversibility" line.
+3. Toy task, a few minutes on CPU. Turning this into publishable evidence means scaling up, adding stronger baselines, and designing tasks that demand *both* nonlinearity and exact conservation.
+
+→ [details](demos/box_ball_system/README.md)
+
+## What is and isn't novel here
+
+Honest, in three layers (full version in [../CATALOG.md](../CATALOG.md)):
+
+- **Integrable systems + deep learning** — plenty of people do it, but in the *opposite* direction: using neural nets to solve or discover integrable systems (Lax-pair networks, Darboux-transform nets, conservation-law PINNs, SILO). That is "AI as the tool, physics as the goal" — exactly what we avoid.
+- **The Box-Ball System** — well studied in mathematical physics (Takahashi–Satsuma 1990; Ferrari et al. 2018), but apparently no one has run it as a *sequence model trained on an AI task and benchmarked against a Transformer*.
+- **Length extrapolation** — that structured/recurrent models extrapolate where Transformers don't is an established result (I-BERT; Liu et al. 2023; Merrill & Sabharwal 2023/2024). So the novelty here is the *carrier and the framing, not the capability*.
+
+The collisions are all at the level of parts; nothing collides at the level of the skeleton. **No one has assembled these into "physics is a systematically mineable model library, integrable systems are one un-mined mine, and the proof happens on AI's own turf."** That organizing logic is the point.
+
+## Reproduce the demos
 
 ```bash
-# demo 1 — 孤立子信道
+# Demo 1 — soliton channel
 cd demos/soliton_channel && pip install numpy matplotlib && python soliton_channel.py
 
-# demo 2 — 箱球系统 vs Transformer（CPU 即可）
+# Demo 2 — box-ball system vs Transformer (CPU is enough)
 cd demos/box_ball_system && pip install torch numpy matplotlib && python box_ball_system.py
 ```
