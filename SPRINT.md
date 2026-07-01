@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-01 23:57 UTC  
+**Generated:** 2026-07-01 23:59 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 10 |
+| Total commits | 11 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **3** | ⚪ | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **4** | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -29,6 +29,7 @@
 
 **Wed – Wednesday, Jul 1**
 
+- `6278a15` demo1: keep the mp4 locally, git-ignore it (don't upload) — _dongzhang84_ `2026-07-01 16:59`
 - `8edaa3d` demo1: add animated soliton-channel GIF, embed in the demo README — _dongzhang84_ `2026-07-01 16:57`
 - `089a785` docs: add the real motivation for demo 1 (attention is lossy; solitons aren't) — _dongzhang84_ `2026-07-01 16:43`
 - `6da22d1` docs: rewrite soliton-channel README for non-experts — _dongzhang84_ `2026-07-01 00:39`
