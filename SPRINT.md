@@ -1,11 +1,29 @@
 # Sprint Report
 
-**Generated:** 2026-06-24 18:19 UTC  
-**Showing:** last 1 week(s) of 1 total  
+**Generated:** 2026-07-01 00:38 UTC  
+**Showing:** last 2 week(s) of 2 total  
 
 ---
 
-## Week 1 _(current)_ · 2026-06-22 to 2026-06-28
+## Week 2 _(current)_ · 2026-06-29 to 2026-07-05
+
+| Stat | Value |
+|------|-------|
+| Status | ❌ Stalled |
+| Active days | 1 / 7 |
+| Total commits | 1 |
+
+| Mon | Tue | Wed | Thu | Fri | Sat | Sun |
+|---|---|---|---|---|---|---|
+| ⚪ | **1** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+
+**Tue – Tuesday, Jun 30**
+
+- `f47dff3` restructure: demos_1 → integrable_reversible research project — _dongzhang84_ `2026-06-30 17:38`
+
+---
+
+## Week 1 · 2026-06-22 to 2026-06-28
 
 | Stat | Value |
 |------|-------|
