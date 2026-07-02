@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-02 05:26 UTC  
+**Generated:** 2026-07-02 18:26 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -9,13 +9,13 @@
 
 | Stat | Value |
 |------|-------|
-| Status | ❌ Stalled |
-| Active days | 2 / 7 |
-| Total commits | 13 |
+| Status | ⚠️ Slow |
+| Active days | 3 / 7 |
+| Total commits | 14 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | ⚪ | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **6** | **1** | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -35,6 +35,10 @@
 - `8edaa3d` demo1: add animated soliton-channel GIF, embed in the demo README — _dongzhang84_ `2026-07-01 16:57`
 - `089a785` docs: add the real motivation for demo 1 (attention is lossy; solitons aren't) — _dongzhang84_ `2026-07-01 16:43`
 - `6da22d1` docs: rewrite soliton-channel README for non-experts — _dongzhang84_ `2026-07-01 00:39`
+
+**Thu – Thursday, Jul 2**
+
+- `97ef7ac` experiments: Route C prototype — learned carrier vs Transformer on BBS — _dongzhang84_ `2026-07-02 11:25`
 
 ---
 
