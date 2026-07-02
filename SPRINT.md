@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-02 19:27 UTC  
+**Generated:** 2026-07-02 19:37 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ⚠️ Slow |
 | Active days | 3 / 7 |
-| Total commits | 18 |
+| Total commits | 19 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **5** | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **6** | **6** | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -38,6 +38,7 @@
 
 **Thu – Thursday, Jul 2**
 
+- `7e342c6` docs: experiments index — the Route C arc (three experiments, one story) — _dongzhang84_ `2026-07-02 12:37`
 - `2b3f721` experiments: Route C v2 (conserving carrier) — learned model hits the ceiling on all three — _dongzhang84_ `2026-07-02 12:27`
 - `bf3e59b` experiments: full Route C four-way (reversible+conservative CA) — honest partial result — _dongzhang84_ `2026-07-02 12:13`
 - `17c5a02` docs: bilingual experiment report (English README.md + Chinese README.zh-CN.md) — _dongzhang84_ `2026-07-02 11:36`
