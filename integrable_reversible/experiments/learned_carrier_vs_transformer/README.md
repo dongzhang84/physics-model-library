@@ -1,67 +1,69 @@
-# 实验报告 · 学出来的搬运工 vs Transformer（路线 C 原型）
+# Experiment · Learned Carrier vs Transformer (Route C prototype)
 
-> 脚本：[`learned_carrier_vs_transformer.py`](learned_carrier_vs_transformer.py)　图：[`learned_carrier_vs_transformer.png`](learned_carrier_vs_transformer.png)
-> 一次运行（单随机种子，CPU 几十秒）。定位：路线 C 的第一块砖，不是最终结果。
+**English** · [中文](README.zh-CN.md)
 
-## 一句话结论
+> Script: [`learned_carrier_vs_transformer.py`](learned_carrier_vs_transformer.py)　Figure: [`learned_carrier_vs_transformer.png`](learned_carrier_vs_transformer.png)
+> One run (single random seed, tens of seconds on CPU). Status: the first brick of Route C, not a final result.
 
-去掉 Demo 2 的"作弊"后，**一个真训练出来、带长度无关结构的模型，在超训练长度上仍稳住 ~92% 准确率（Transformer 崩到平庸基线）——但它的守恒球数照样往 0 漂。** 结论分成两半：**结构 + 学习买到了"准确率外推"，却没买到"精确守恒"**。后者正是可积系统的独家卖点，必须靠结构焊死，这就是完整路线 C 要补的那一块。
+## One-line takeaway
+
+Once Demo 2's "cheat" is removed, **a genuinely trained model carrying a length-independent structure still holds ~92% per-position accuracy beyond its training length (the Transformer collapses to the trivial baseline) — yet its conserved ball-count still drifts toward zero.** The conclusion splits in two: **structure + learning buys "accuracy extrapolation", but not "exact conservation".** The latter is integrable systems' exclusive gift and must be welded in by structure — precisely the missing piece of full Route C.
 
 ---
 
-## 1. 为什么做这个（去掉 Demo 2 的作弊）
+## 1. Why this experiment (removing Demo 2's cheat)
 
-Demo 2 里的"可积引擎"是**硬编规则**，也就是生成标签的那条规则本身。拿标准答案去比一个想学它的 Transformer、再宣布标准答案 100%，接近同义反复——这是 Demo 2 最大的问题。
+In Demo 2 the "integrable engine" is the **hard-coded rule** — i.e. the very generator of the labels. Pitting that answer key against a Transformer that is trying to learn it, then declaring the answer key 100%, is close to tautological — Demo 2's biggest weakness.
 
-本实验把这个作弊去掉：**保留硬编可积那条线只当天花板**，另加一个**真正训练出来的模型**，看"学出来的"能不能也外推。
+This experiment removes the cheat: **keep the hard-coded integrable line only as a ceiling**, and add a **genuinely trained** model to test whether a *learned* model can also extrapolate.
 
-## 2. 三个模型
+## 2. The three models
 
-| 模型 | 结构 | 规则从哪来 | 角色 |
+| Model | Structure | Where the rule comes from | Role |
 |---|---|---|---|
-| 硬编可积（BBS 搬运工） | — | 写死（是真值生成器） | 天花板 / 作弊参照 |
-| **学出来的搬运工（本文主角）** | 权重共享的左→右循环扫描，带一个小的"进位状态"；单步学会后套用 T 次 | **从 L=32 数据里学**，从没见过 BBS 规则 | 路线 C 原型 |
-| Transformer | 通用注意力（正弦位置编码，能吃更长输入） | 从 L=32 数据里学 | 下界 / 无结构对照 |
+| Hard-coded integrable (BBS carrier) | — | Written in (it is the ground-truth generator) | Ceiling / cheat reference |
+| **Learned carrier (the protagonist)** | Weight-shared left→right recurrent scan with a small "carrier" state; learn the single step, apply it T times | **Learned from L=32 data**, never sees the BBS rule | Route C prototype |
+| Transformer | Generic attention (sinusoidal PE, so it can accept longer inputs) | Learned from L=32 data | Lower bound / no-structure control |
 
-- **任务**：给一个 0/1 状态，预测演化 **2 步**后的状态。
-- **训练**：两个学习模型都**只在 L=32 上训练**。
-- **测试**：L = 32 / 48 / 64 / 96 / 128；孤立子大小与密度在所有长度上固定 → **纯长度外推**。
-- **为什么"学出来的搬运工"能在任意长度上跑**：它的权重与位置无关、进位状态大小固定，所以换任意长度都照跑；而它**算什么是学来的**——这就把作弊去掉了。
+- **Task**: given a 0/1 state, predict its state after **2 steps**.
+- **Training**: both learned models are trained on **L=32 only**.
+- **Testing**: L = 32 / 48 / 64 / 96 / 128; soliton size and density fixed across lengths → **pure length extrapolation**.
+- **Why the learned carrier can run at any length**: its weights are position-independent and its carrier state is fixed-size, so it runs at any length; but **what it computes is learned** — that is what removes the cheat.
 
-## 3. 结果
+## 3. Results
 
-![三线图](learned_carrier_vs_transformer.png)
+![three-line figure](learned_carrier_vs_transformer.png)
 
-| 长度 | 全 0 基线（稀疏参照） | Transformer 准确率 / 守恒 | **学出来的搬运工** 准确率 / 守恒 | 硬编可积 |
+| Length | All-zeros baseline (sparsity) | Transformer acc / conserved | **Learned carrier** acc / conserved | Hard-coded integrable |
 |---|---|---|---|---|
-| 32（训练） | 84.2% | 94.5% / 29.0% | 94.1% / 32.7% | 100% / 100% |
+| 32 (train) | 84.2% | 94.5% / 29.0% | 94.1% / 32.7% | 100% / 100% |
 | 48 | 83.7% | 83.7% / **0.0%** | **93.3%** / 21.7% | 100% / 100% |
 | 64 | 82.9% | 82.0% / 0.0% | **92.5%** / 12.0% | 100% / 100% |
 | 96 | 82.7% | 81.8% / 0.0% | **92.5%** / 6.0% | 100% / 100% |
 | 128 | 82.3% | 80.9% / 0.0% | **92.1%** / 3.3% | 100% / 100% |
 
-## 4. 解读（两个不同的事）
+## 4. Reading the result (two separate things)
 
-**① 准确率外推：结构赢了，而且不作弊。**
-学出来的搬运工在所有长度上稳在 ~92%，基本贴着天花板；Transformer 一出训练长度就**掉到全 0 基线**上——OOD 长度上它几乎什么都没学到（也印证了之前"逐位 81% 是被稀疏性灌水"的判断：全 0 基线本就 ~82%）。**关键：主角是真训练出来的、没见过规则，照样外推。"作弊"去掉了，"学出来也能外推、Transformer 不能"这个结论仍然成立。**
+**① Accuracy extrapolation: structure wins, and without cheating.**
+The learned carrier stays at ~92% across all lengths, tracking just under the ceiling; the Transformer, once past its training length, **falls to the all-zeros baseline** — out of distribution it has learned almost nothing (confirming the earlier point that "81% per-position is inflated by sparsity": the all-zeros baseline is already ~82%). **Key: the protagonist is genuinely trained and never saw the rule, yet it extrapolates. The cheat is gone, and the conclusion — "learning can extrapolate, the Transformer cannot" — still holds.**
 
-**② 精确守恒：光有循环结构不够。**
-最有价值的发现——**主角的守恒球数也在往 0 漂**（32.7 → 21.7 → 12 → 6 → 3.3%），只是比 Transformer（直接归零）慢一截。原因：这个原型的可逆 / 守恒是**近似学出来的、不是结构保证的**；每位 ~92% 的小误差沿长度累积，精确守恒就塌了。
+**② Exact conservation: a recurrent structure alone is not enough.**
+The most valuable finding — **the protagonist's conserved ball-count also drifts toward zero** (32.7 → 21.7 → 12 → 6 → 3.3%), just more slowly than the Transformer (which drops straight to 0). Reason: this prototype's reversibility/conservation is **approximately learned, not structurally guaranteed**; small ~92%-per-position errors accumulate over length until exact conservation collapses.
 
-**合起来**：通用循环结构**买到了准确率外推，但没买到精确守恒**。而"精确守恒 + 精确可逆"正是可积系统区别于普通循环模型的独家馈赠。所以这个原型精确地指出了完整路线 C 还差的那块：**把守恒和可逆用结构焊死**（coupling 层 + 结构性不变量），让主角那条守恒线也变成平的 100%。
+**Together**: a generic recurrent structure **buys accuracy extrapolation but not exact conservation**. And "exact conservation + exact reversibility" is exactly what sets integrable systems apart from ordinary recurrent models. So this prototype pinpoints the missing piece of full Route C: **weld conservation and reversibility in by structure** (coupling layers + a structural invariant) so the protagonist's conservation line also becomes a flat 100%.
 
-## 5. 诚实边界
+## 5. Honest boundaries
 
-1. **单次运行、单随机种子、玩具规模**（CPU 几十秒）。趋势清楚，但数字会随种子小幅波动，正式版需多种子取均值 + 误差棒。
-2. **主角焊进去的是"循环 / 局部"这个计算形式**，这部分带来的长度外推与已有文献（循环模型外推优于 Transformer）重叠。**本原型独家贡献的是把"守恒的缺失"量化出来**——证明"精确守恒必须结构化，不能靠学"。
-3. **可逆性本实验没测**（主角是前向扫描，不是结构可逆）。它属于下一步。
-4. 逐位准确率仍是弱指标（被稀疏性抬高），所以报告里同时给了全 0 基线和守恒两个更硬的量。
+1. **Single run, single seed, toy scale** (tens of seconds on CPU). The trend is clear, but numbers wobble across seeds; a real version needs multiple seeds with mean ± error bars.
+2. **What the protagonist welds in is the "recurrent/local" computational form.** The length extrapolation this buys overlaps existing literature (recurrent models extrapolate better than Transformers). **What this prototype exclusively contributes is quantifying the *absence* of conservation** — evidence that "exact conservation must be structural, not learned".
+3. **Reversibility is not measured here** (the protagonist is a forward scan, not structurally reversible). That belongs to the next step.
+4. Per-position accuracy is still a soft metric (inflated by sparsity), so the report also reports the all-zeros baseline and conservation as two harder quantities.
 
-## 6. 下一步
+## 6. Next step
 
-把"学出来的搬运工"升级成**结构可逆 + 结构守恒**的版本（路线 C 完整体）：
-- 可逆性用 coupling 层焊死（无论内部函数学成什么都可逆）；
-- 球数守恒作为结构约束卡住；
-- 目标：让上表**主角的守恒列从"往 0 漂"变成"恒 100%"**，同时准确率仍贴天花板。
+Upgrade the "learned carrier" into a **structurally reversible + structurally conserving** version (full Route C):
+- reversibility welded in via coupling layers (invertible no matter what the inner function learns);
+- ball-count conservation enforced as a structural constraint;
+- goal: turn the protagonist's conservation column from "drifting to 0" into "a flat 100%", while accuracy still tracks the ceiling.
 
-做到那一步，这个对比就从"原型演示"变成"可发表结果"。
+Reach that, and this comparison graduates from "prototype demo" to "publishable result".
