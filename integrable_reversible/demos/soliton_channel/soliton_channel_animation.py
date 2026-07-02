@@ -8,18 +8,19 @@ the full time evolution as a movie:
   BOT  — NON-integrable control (linear dispersion): the same 4 pulses smear
          and delocalize; the symbols are lost.
 
-Outputs two files (ffmpeg required on PATH):
-  - soliton_channel.mp4 — crisp full-quality movie (kept locally; git-ignored,
+Outputs two files (ffmpeg required on PATH). Both are built from the SAME
+lossless matplotlib frames (no H.264 intermediate for the GIF → it stays as
+sharp as the static PNG):
+  - soliton_channel.gif — crisp palette GIF at native ~1100px (~2.4 MB),
+    embedded & auto-playing in the README (this one is committed).
+  - soliton_channel.mp4 — full-quality movie (kept locally; git-ignored,
     NOT uploaded — see .gitignore `*.mp4`).
-  - soliton_channel.gif — palette-optimized (~1 MB), embedded & auto-playing in
-    the README (this one is committed).
 Does not touch soliton_channel.py or soliton_channel_demo.png.
 """
 
-import os, subprocess, tempfile
+import os, subprocess, tempfile, shutil
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 # ── physics (identical to soliton_channel.py) ───────────────────────────────
 Lx, N = 120.0, 1024
@@ -54,7 +55,7 @@ Eh, E2 = make_E(dt)
 g = -3j*k*dt
 
 # ── collect frames of the full evolution (both channels) ────────────────────
-FRAMES = 200
+FRAMES = 140
 stride = T // FRAMES
 
 vk = np.fft.fft(u0.copy())          # KdV state (Fourier)
@@ -99,21 +100,33 @@ def draw(i):
     fill0[0].remove(); fill0[0] = ax0.fill_between(x, 0, uk, color="#1f77b4", alpha=0.15)
     fill1[0].remove(); fill1[0] = ax1.fill_between(x, 0, ul, color="#d62728", alpha=0.12)
     tt.set_text(f"t = {times[i]:4.1f}     peak |u|:  KdV={np.abs(uk).max():.2f}   disp={np.abs(ul).max():.2f}")
-    return line0, line1, fill0[0], fill1[0], tt
 
-anim = FuncAnimation(fig, draw, frames=len(kdv_frames), interval=40, blit=False)
+# ── render lossless PNG frames ONCE, then build gif + mp4 from them ──────────
+# Building the GIF from lossless frames (not from an H.264 mp4) is what keeps it
+# as sharp as the static PNG.
+frames_dir = tempfile.mkdtemp(prefix="soliton_frames_")
+for i in range(len(kdv_frames)):
+    draw(i)
+    fig.savefig(os.path.join(frames_dir, f"f{i:03d}.png"), dpi=100)   # ~1100px wide
+plt.close(fig)
 
-# Render the full-quality mp4 (kept locally), then convert to a
-# palette-optimized GIF via ffmpeg (much smaller than a direct pillow GIF).
-anim.save("soliton_channel.mp4", writer=FFMpegWriter(fps=25, bitrate=2400), dpi=130)
+FPS = 15
+seq = os.path.join(frames_dir, "f%03d.png")
+W = 1100
+
+# crisp palette GIF at native width (committed, embeds & auto-plays in README)
+pal = os.path.join(frames_dir, "palette.png")
+subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", seq,
+                "-vf", f"scale={W}:-1:flags=lanczos,palettegen=stats_mode=full", pal], check=True)
+subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", seq, "-i", pal,
+                "-lavfi", f"scale={W}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=none",
+                "soliton_channel.gif"], check=True)
+print("saved soliton_channel.gif")
+
+# full-quality mp4 (kept locally; git-ignored, not uploaded)
+subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", seq,
+                "-vf", f"scale={W}:-2:flags=lanczos", "-pix_fmt", "yuv420p",
+                "soliton_channel.mp4"], check=True)
 print("saved soliton_channel.mp4  (local only; git-ignored)")
 
-pal = os.path.join(tempfile.gettempdir(), "soliton_palette.png")
-vf = "fps=10,scale=560:-1:flags=lanczos"
-subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", "soliton_channel.mp4",
-                "-vf", f"{vf},palettegen=stats_mode=diff", pal], check=True)
-subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", "soliton_channel.mp4", "-i", pal,
-                "-lavfi", f"{vf}[x];[x][1:v]paletteuse=dither=none",
-                "soliton_channel.gif"], check=True)
-os.remove(pal)
-print("saved soliton_channel.gif")
+shutil.rmtree(frames_dir, ignore_errors=True)
