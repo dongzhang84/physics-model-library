@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-02 19:37 UTC  
+**Generated:** 2026-07-02 23:19 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ⚠️ Slow |
 | Active days | 3 / 7 |
-| Total commits | 19 |
+| Total commits | 20 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **6** | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **6** | **7** | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -38,6 +38,7 @@
 
 **Thu – Thursday, Jul 2**
 
+- `c874182` experiments: consolidate the 3 Route C iterations into one folder route_c_bbs/ — _dongzhang84_ `2026-07-02 16:19`
 - `7e342c6` docs: experiments index — the Route C arc (three experiments, one story) — _dongzhang84_ `2026-07-02 12:37`
 - `2b3f721` experiments: Route C v2 (conserving carrier) — learned model hits the ceiling on all three — _dongzhang84_ `2026-07-02 12:27`
 - `bf3e59b` experiments: full Route C four-way (reversible+conservative CA) — honest partial result — _dongzhang84_ `2026-07-02 12:13`
