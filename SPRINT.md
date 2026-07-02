@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-02 23:19 UTC  
+**Generated:** 2026-07-02 23:33 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ⚠️ Slow |
 | Active days | 3 / 7 |
-| Total commits | 20 |
+| Total commits | 21 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **7** | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **6** | **8** | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -38,6 +38,7 @@
 
 **Thu – Thursday, Jul 2**
 
+- `672a6ec` experiments: rename route_c_bbs -> box_ball_learned_vs_transformer — _dongzhang84_ `2026-07-02 16:33`
 - `c874182` experiments: consolidate the 3 Route C iterations into one folder route_c_bbs/ — _dongzhang84_ `2026-07-02 16:19`
 - `7e342c6` docs: experiments index — the Route C arc (three experiments, one story) — _dongzhang84_ `2026-07-02 12:37`
 - `2b3f721` experiments: Route C v2 (conserving carrier) — learned model hits the ceiling on all three — _dongzhang84_ `2026-07-02 12:27`
