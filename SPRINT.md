@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-02 00:03 UTC  
+**Generated:** 2026-07-02 05:26 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 12 |
+| Total commits | 13 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **5** | ⚪ | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **6** | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -29,6 +29,7 @@
 
 **Wed – Wednesday, Jul 1**
 
+- `c2337a7` docs: adopt final motivation draft; sharpen the attention claim — _dongzhang84_ `2026-07-01 22:26`
 - `a3a2f61` demo1: render a crisp (native 1100px) GIF as sharp as the static figure — _dongzhang84_ `2026-07-01 17:03`
 - `6278a15` demo1: keep the mp4 locally, git-ignore it (don't upload) — _dongzhang84_ `2026-07-01 16:59`
 - `8edaa3d` demo1: add animated soliton-channel GIF, embed in the demo README — _dongzhang84_ `2026-07-01 16:57`
