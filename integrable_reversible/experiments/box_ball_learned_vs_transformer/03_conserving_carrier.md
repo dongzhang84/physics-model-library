@@ -1,4 +1,4 @@
-# Experiment · Route C (v2) — a learned carrier that conserves by construction
+# Test 3 · Conserving carrier — learns it, and conserves + reverses exactly
 
 **English** · [中文](03_conserving_carrier.zh-CN.md)
 

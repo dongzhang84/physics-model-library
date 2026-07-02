@@ -1,5 +1,5 @@
 """
-Route C (v2) — the reversible, mass-CONSERVING carrier.
+The conserving carrier (the proposal's Route C) — the reversible, mass-CONSERVING carrier.
 
 The previous full-Route-C attempt (local gated-swap CA) had the guarantees but
 couldn't learn BBS. The fix: keep the CARRIER (left->right reach = expressive)

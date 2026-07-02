@@ -1,4 +1,4 @@
-# Experiments — the Route C arc
+# Learning an integrable model on the Box-Ball System (3 tests)
 
 **English** · [中文](README.zh-CN.md)
 
@@ -8,7 +8,7 @@ The research question behind Demo 2: once you remove its **cheat** (the "integra
 
 | # | Test | What it tried | Outcome |
 |---|---|---|---|
-| 1 | [`01_carrier_vs_transformer.md`](01_carrier_vs_transformer.md) | Remove the cheat: a learned left→right **carrier** (rule learned, not hard-coded) vs Transformer | Carrier **extrapolates in accuracy** (~99% at all lengths) where the Transformer collapses — but its **conservation drifts** (recurrence buys accuracy, not the invariant). |
+| 1 | [`01_plain_carrier.md`](01_plain_carrier.md) | Remove the cheat: a learned left→right **carrier** (rule learned, not hard-coded) vs Transformer | Carrier **extrapolates in accuracy** (~99% at all lengths) where the Transformer collapses — but its **conservation drifts** (recurrence buys accuracy, not the invariant). |
 | 2 | [`02_reversible_swap_ca.md`](02_reversible_swap_ca.md) | Weld the guarantees: a **reversible + conservative gated-swap CA** (conservation & reversibility exact by construction) | Guarantees **verified exact**, but the *local* swap structure **couldn't learn** BBS (accuracy stuck ~82%). Exposed a **guarantee-vs-expressivity tension**. |
 | 3 | [`03_conserving_carrier.md`](03_conserving_carrier.md) | Unite both: keep the carrier's reach, constrain its per-site update to **conserve** (emit/hold) | **The result.** A learned model at **100% accuracy** (all lengths), **100% conservation**, **100% reversible** — tracks the cheat ceiling on both panels, no cheating (loss → 0.0001). |
 

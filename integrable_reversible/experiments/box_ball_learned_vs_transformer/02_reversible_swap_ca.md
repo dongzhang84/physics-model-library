@@ -1,4 +1,4 @@
-# Experiment · Route C (full) — welding reversibility + conservation into a learned model
+# Test 2 · Reversible swap-automaton — exact guarantees, but can't learn the rule
 
 **English** · [中文](02_reversible_swap_ca.zh-CN.md)
 

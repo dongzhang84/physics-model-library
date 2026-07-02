@@ -1,4 +1,4 @@
-# 实验总览 —— 路线 C 的故事线
+# 在箱球系统上学一个可积模型（3 个 test）
 
 [English](README.md) · **中文**
 
@@ -8,7 +8,7 @@ Demo 2 背后的研究问题:去掉它的**作弊**(那个"可积引擎"就是�
 
 | # | Test | 尝试了什么 | 结局 |
 |---|---|---|---|
-| 1 | [`01_carrier_vs_transformer.md`](01_carrier_vs_transformer.md) | 去作弊:一个学出来的左→右**搬运工**(规则是学的,不是硬编)vs Transformer | 搬运工**准确率能外推**(所有长度 ~99%),Transformer 崩;但它的**守恒往下漂**(循环买到准确率,买不到不变量)。 |
+| 1 | [`01_plain_carrier.md`](01_plain_carrier.md) | 去作弊:一个学出来的左→右**搬运工**(规则是学的,不是硬编)vs Transformer | 搬运工**准确率能外推**(所有长度 ~99%),Transformer 崩;但它的**守恒往下漂**(循环买到准确率,买不到不变量)。 |
 | 2 | [`02_reversible_swap_ca.md`](02_reversible_swap_ca.md) | 焊保证:一个**可逆 + 守恒的门控交换 CA**(守恒与可逆 by construction 精确) | 保证**验证精确**,但**局部**交换结构**学不会** BBS(准确率卡 ~82%)。暴露了**保证 vs 表达力**的张力。 |
 | 3 | [`03_conserving_carrier.md`](03_conserving_carrier.md) | 两者合一:保留搬运工的 reach,把每步更新约束成**守恒**(emit/hold) | **就是它。** 学出来的模型 **100% 准确率**(所有长度)、**100% 守恒**、**100% 可逆**——同时贴住两块天花板,不作弊(loss → 0.0001)。 |
 

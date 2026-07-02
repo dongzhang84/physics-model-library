@@ -1,5 +1,5 @@
 """
-Route C (full) — four-way comparison on the Box-Ball System length task.
+Reversible + conserving swap-automaton (the proposal's Route C) — four-way comparison on the Box-Ball System length task.
 
 Four lines, each isolating one thing:
   1. hard-coded integrable (BBS rule)         -> ceiling / cheat reference
