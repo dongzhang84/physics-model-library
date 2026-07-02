@@ -230,5 +230,5 @@ ax[1].set_ylim(-3, 105); ax[1].set_title("Invariant (# balls) preserved?  #3 is 
 ax[1].legend(fontsize=8); ax[1].grid(alpha=0.3)
 fig.suptitle("Route C — welding reversibility+conservation into a LEARNED model (four-way)", fontsize=12, y=1.02)
 fig.tight_layout()
-fig.savefig("route_c_reversible_ca.png", dpi=130, bbox_inches="tight")
-print("\nsaved route_c_reversible_ca.png")
+fig.savefig("02_reversible_swap_ca.png", dpi=130, bbox_inches="tight")
+print("\nsaved 02_reversible_swap_ca.png")

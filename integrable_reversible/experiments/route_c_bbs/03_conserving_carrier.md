@@ -1,8 +1,8 @@
 # Experiment · Route C (v2) — a learned carrier that conserves by construction
 
-**English** · [中文](README.zh-CN.md)
+**English** · [中文](03_conserving_carrier.zh-CN.md)
 
-> Script: [`route_c_conservative_carrier.py`](route_c_conservative_carrier.py)　Figure: [`route_c_conservative_carrier.png`](route_c_conservative_carrier.png)
+> Script: [`03_conserving_carrier.py`](03_conserving_carrier.py)　Figure: [`03_conserving_carrier.png`](03_conserving_carrier.png)
 > One run (single seed, CPU). Status: **the result we were after** — a genuinely learned model that matches the cheat ceiling on accuracy *and* conserves + reverses exactly, and extrapolates to any length.
 
 ## One-line takeaway
@@ -24,7 +24,7 @@ v1 (a local gated-swap CA) guaranteed conservation+reversibility but the *local*
 
 ## Results (trained on L=32 only; tested OOD by length)
 
-![four-way figure](route_c_conservative_carrier.png)
+![four-way figure](03_conserving_carrier.png)
 
 | Length | all-zeros | Transformer acc / cons | Plain carrier acc / cons | **Conserving carrier** acc / cons | Integrable |
 |---|---|---|---|---|---|

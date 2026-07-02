@@ -1,8 +1,8 @@
 # 实验报告 · 学出来的搬运工 vs Transformer（路线 C 原型）
 
-[English](README.md) · **中文**
+[English](01_carrier_vs_transformer.md) · **中文**
 
-> 脚本：[`learned_carrier_vs_transformer.py`](learned_carrier_vs_transformer.py)　图：[`learned_carrier_vs_transformer.png`](learned_carrier_vs_transformer.png)
+> 脚本：[`01_carrier_vs_transformer.py`](01_carrier_vs_transformer.py)　图：[`01_carrier_vs_transformer.png`](01_carrier_vs_transformer.png)
 > 一次运行（单随机种子，CPU 几十秒）。定位：路线 C 的第一块砖，不是最终结果。
 
 ## 一句话结论
@@ -32,7 +32,7 @@ Demo 2 里的"可积引擎"是**硬编规则**，也就是生成标签的那条�
 
 ## 3. 结果
 
-![三线图](learned_carrier_vs_transformer.png)
+![三线图](01_carrier_vs_transformer.png)
 
 | 长度 | 全 0 基线（稀疏参照） | Transformer 准确率 / 守恒 | **学出来的搬运工** 准确率 / 守恒 | 硬编可积 |
 |---|---|---|---|---|

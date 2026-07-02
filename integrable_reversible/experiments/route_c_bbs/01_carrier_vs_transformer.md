@@ -1,8 +1,8 @@
 # Experiment · Learned Carrier vs Transformer (Route C prototype)
 
-**English** · [中文](README.zh-CN.md)
+**English** · [中文](01_carrier_vs_transformer.zh-CN.md)
 
-> Script: [`learned_carrier_vs_transformer.py`](learned_carrier_vs_transformer.py)　Figure: [`learned_carrier_vs_transformer.png`](learned_carrier_vs_transformer.png)
+> Script: [`01_carrier_vs_transformer.py`](01_carrier_vs_transformer.py)　Figure: [`01_carrier_vs_transformer.png`](01_carrier_vs_transformer.png)
 > One run (single random seed, tens of seconds on CPU). Status: the first brick of Route C, not a final result.
 
 ## One-line takeaway
@@ -32,7 +32,7 @@ This experiment removes the cheat: **keep the hard-coded integrable line only as
 
 ## 3. Results
 
-![three-line figure](learned_carrier_vs_transformer.png)
+![three-line figure](01_carrier_vs_transformer.png)
 
 | Length | All-zeros baseline (sparsity) | Transformer acc / conserved | **Learned carrier** acc / conserved | Hard-coded integrable |
 |---|---|---|---|---|

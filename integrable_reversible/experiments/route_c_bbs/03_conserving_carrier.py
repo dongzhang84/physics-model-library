@@ -181,5 +181,5 @@ ax[0].set_ylim(50, 102); ax[0].set_title("Accuracy vs length"); ax[0].legend(fon
 ax[1].set_xlabel("lattice length"); ax[1].set_ylabel("ball-count conserved (%)"); ax[1].set_ylim(-3, 105)
 ax[1].set_title("Invariant (# balls) preserved?  #3 conserves by construction"); ax[1].legend(fontsize=8); ax[1].grid(alpha=0.3)
 fig.suptitle("Route C v2 — a LEARNED carrier that conserves by construction (four-way)", fontsize=12, y=1.02)
-fig.tight_layout(); fig.savefig("route_c_conservative_carrier.png", dpi=130, bbox_inches="tight")
-print("saved route_c_conservative_carrier.png")
+fig.tight_layout(); fig.savefig("03_conserving_carrier.png", dpi=130, bbox_inches="tight")
+print("saved 03_conserving_carrier.png")

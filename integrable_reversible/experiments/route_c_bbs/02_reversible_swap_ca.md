@@ -1,8 +1,8 @@
 # Experiment · Route C (full) — welding reversibility + conservation into a learned model
 
-**English** · [中文](README.zh-CN.md)
+**English** · [中文](02_reversible_swap_ca.zh-CN.md)
 
-> Script: [`route_c_reversible_ca.py`](route_c_reversible_ca.py)　Figure: [`route_c_reversible_ca.png`](route_c_reversible_ca.png)
+> Script: [`02_reversible_swap_ca.py`](02_reversible_swap_ca.py)　Figure: [`02_reversible_swap_ca.png`](02_reversible_swap_ca.png)
 > One run (single seed, CPU). Status: an honest partial result — the guarantees work, the accuracy does not (yet). It locates the next design.
 
 ## One-line takeaway
@@ -22,7 +22,7 @@
 
 ## Results (trained on L=32 only; tested OOD by length)
 
-![four-way figure](route_c_reversible_ca.png)
+![four-way figure](02_reversible_swap_ca.png)
 
 | Length | all-zeros | Transformer acc / cons | Carrier acc / cons | **Route C CA** acc / cons | Integrable |
 |---|---|---|---|---|---|

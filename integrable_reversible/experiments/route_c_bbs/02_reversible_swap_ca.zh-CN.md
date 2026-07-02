@@ -1,8 +1,8 @@
 # 实验报告 · 路线 C（完整）——把可逆 + 守恒焊进一个学习模型
 
-[English](README.md) · **中文**
+[English](02_reversible_swap_ca.md) · **中文**
 
-> 脚本：[`route_c_reversible_ca.py`](route_c_reversible_ca.py)　图：[`route_c_reversible_ca.png`](route_c_reversible_ca.png)
+> 脚本：[`02_reversible_swap_ca.py`](02_reversible_swap_ca.py)　图：[`02_reversible_swap_ca.png`](02_reversible_swap_ca.png)
 > 一次运行（单随机种子，CPU）。定位：一个诚实的**部分结果**——保证做到了，准确率（暂时）没做到。它精确指出了下一步该怎么设计。
 
 ## 一句话结论
@@ -22,7 +22,7 @@
 
 ## 结果（只在 L=32 训练;按长度 OOD 测试）
 
-![四路图](route_c_reversible_ca.png)
+![四路图](02_reversible_swap_ca.png)
 
 | 长度 | 全 0 基线 | Transformer 准确率/守恒 | 搬运工 准确率/守恒 | **路线 C CA** 准确率/守恒 | 硬编可积 |
 |---|---|---|---|---|---|

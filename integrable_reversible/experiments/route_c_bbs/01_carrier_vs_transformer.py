@@ -170,5 +170,5 @@ ax[1].legend(fontsize=8); ax[1].grid(alpha=0.3)
 fig.suptitle("Route C prototype — a LEARNED length-independent structure vs a Transformer "
              "(hard-coded integrable = ceiling)", fontsize=12, y=1.02)
 fig.tight_layout()
-fig.savefig("learned_carrier_vs_transformer.png", dpi=130, bbox_inches="tight")
-print("\nsaved learned_carrier_vs_transformer.png")
+fig.savefig("01_carrier_vs_transformer.png", dpi=130, bbox_inches="tight")
+print("\nsaved 01_carrier_vs_transformer.png")

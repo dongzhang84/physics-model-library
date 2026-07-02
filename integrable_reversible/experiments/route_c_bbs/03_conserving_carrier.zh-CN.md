@@ -1,8 +1,8 @@
 # 实验报告 · 路线 C（v2）——一个 by construction 守恒的学习搬运工
 
-[English](README.md) · **中文**
+[English](03_conserving_carrier.md) · **中文**
 
-> 脚本：[`route_c_conservative_carrier.py`](route_c_conservative_carrier.py)　图：[`route_c_conservative_carrier.png`](route_c_conservative_carrier.png)
+> 脚本：[`03_conserving_carrier.py`](03_conserving_carrier.py)　图：[`03_conserving_carrier.png`](03_conserving_carrier.png)
 > 一次运行（单种子，CPU）。定位：**我们一直想要的那个结果**——一个真正学出来的模型,准确率贴天花板、且精确守恒 + 精确可逆,还能外推到任意长度。
 
 ## 一句话结论
@@ -24,7 +24,7 @@ v1(局部门控交换 CA)保证了守恒+可逆,但**局部**结构表达不了 
 
 ## 结果（只在 L=32 训练;按长度 OOD 测试）
 
-![四路图](route_c_conservative_carrier.png)
+![四路图](03_conserving_carrier.png)
 
 | 长度 | 全 0 基线 | Transformer 准确率/守恒 | 普通搬运工 准确率/守恒 | **守恒搬运工** 准确率/守恒 | 硬编可积 |
 |---|---|---|---|---|---|
