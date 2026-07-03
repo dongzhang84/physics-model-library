@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-02 23:47 UTC  
+**Generated:** 2026-07-03 00:39 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ⚠️ Slow |
 | Active days | 3 / 7 |
-| Total commits | 22 |
+| Total commits | 23 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **9** | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **6** | **10** | ⚪ | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -38,6 +38,7 @@
 
 **Thu – Thursday, Jul 2**
 
+- `8602006` docs: fold the 3 per-test reports into one comprehensive README (8 MD files -> 2) — _dongzhang84_ `2026-07-02 17:39`
 - `c9bb6be` docs: clearer test names + de-jargon titles in box_ball_learned_vs_transformer — _dongzhang84_ `2026-07-02 16:47`
 - `672a6ec` experiments: rename route_c_bbs -> box_ball_learned_vs_transformer — _dongzhang84_ `2026-07-02 16:33`
 - `c874182` experiments: consolidate the 3 Route C iterations into one folder route_c_bbs/ — _dongzhang84_ `2026-07-02 16:19`
