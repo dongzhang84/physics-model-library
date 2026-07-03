@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-03 05:09 UTC  
+**Generated:** 2026-07-03 07:27 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -10,12 +10,12 @@
 | Stat | Value |
 |------|-------|
 | Status | ⚠️ Slow |
-| Active days | 3 / 7 |
-| Total commits | 24 |
+| Active days | 4 / 7 |
+| Total commits | 25 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | ⚪ | ⚪ | ⚪ |
+| ⚪ | **7** | **6** | **11** | **1** | ⚪ | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -49,6 +49,10 @@
 - `17c5a02` docs: bilingual experiment report (English README.md + Chinese README.zh-CN.md) — _dongzhang84_ `2026-07-02 11:36`
 - `de18e11` experiments: give each experiment its own folder; add the report — _dongzhang84_ `2026-07-02 11:28`
 - `97ef7ac` experiments: Route C prototype — learned carrier vs Transformer on BBS — _dongzhang84_ `2026-07-02 11:25`
+
+**Fri – Friday, Jul 3**
+
+- `1f4f651` proposal: sync with actual Route C progress — _dongzhang84_ `2026-07-03 00:27`
 
 ---
 
