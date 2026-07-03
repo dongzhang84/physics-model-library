@@ -12,6 +12,10 @@ Demo 2 showed a hard-coded integrable rule (the Box-Ball System, BBS) beating a 
 
 BBS is the ultradiscrete limit of KdV, an integrable cellular automaton on a 0/1 lattice: blocks of 1s are "solitons" that move right and pass through each other, ball-count is conserved, and the dynamics are exactly reversible. Task: given a 0/1 state, predict its state after **2 steps**. Every model is trained **only on length L=32**, then tested on 48/64/96/128 — out of distribution by length alone (soliton size and density fixed). Measured at every length: **per-position accuracy** and whether the **ball-count is conserved**.
 
+![What the L=32 data looks like](bbs_data_l32.gif)
+
+> The `01/02/03` scripts train on random L=32 states like this one. Here a **size-3 soliton (fast) overtakes a size-1 and a size-2, passing _through_ them** — the order swaps, the sizes stay intact, and all 6 balls persist. The `input` (t=0) and `+2 = target` (t=2) rows are the pair the models actually see; the extra steps just show the dynamics. Made by [`bbs_data_l32.py`](bbs_data_l32.py).
+
 ## The three tests at a glance
 
 | # | Model introduced | Idea | Outcome |
