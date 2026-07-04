@@ -44,7 +44,7 @@ The two "failures" weren't detours — they located the answer. #1 showed recurr
 
 Replace the hard-coded rule with a **learned** left→right carrier — a weight-shared recurrent cell with a small carrier state, trained on L=32, applied at any length. It learns the rule from data (never sees it); the hard-coded integrable line stays only as a ceiling.
 
-![Transformer vs the carrier RNN — architecture](architecture_diagram.png)
+![Transformer vs the carrier RNN — architecture](architecture_01_transformer_vs_carrier.png)
 
 > The two learned models side by side. **Transformer**: global self-attention — every output computed from the whole sequence at once, with no order, no carried state, and no conserved quantity. **Carrier**: one weight-shared cell scans left→right carrying a state `h` (like the BBS carrier, but learned), so it runs at any length. (Test 3's conserving carrier is this same scan with the emit/hold conservation constraint added.)
 
@@ -66,6 +66,10 @@ Replace the hard-coded rule with a **learned** left→right carrier — a weight
 
 Weld the guarantees. A stack of **gated swaps** of adjacent cells: a swap conserves the pair's count and is its own inverse; the gate reads only frozen context + the swap-invariant pair sum, so the whole stack is exactly invertible no matter what it learns. Verified at random init (before any training): ball-count conserved exactly and `invert(forward(x)) == x` exactly, at all lengths.
 
+![Reversible swap-automaton — architecture](architecture_02_swap_automaton.png)
+
+> Stacked gated swaps of neighbor pairs, alternating the pairing each layer. A swap conserves the pair's count and is its own inverse, and the gate `g` reads only frozen cells → exactly reversible & conservative *by construction*. But swaps are **local**, so the stack can't express BBS's nonlocal carrier.
+
 ![Test 2](02_reversible_swap_ca.png)
 
 | Length | Transformer acc / cons | plain carrier acc / cons | swap-automaton acc / cons |
@@ -83,6 +87,10 @@ Weld the guarantees. A stack of **gated swaps** of adjacent cells: a swap conser
 *Script: [`03_conserving_carrier.py`](03_conserving_carrier.py)*
 
 Unite both. Keep the **carrier's reach** (test 1) but constrain its per-site update to **conserve** (test 2's discipline). With carrier count `k` and cell `c`, total `t = c + k`; the only count-preserving outcomes are *emit* (`out=1, k'=t−1`) or *hold* (`out=0, k'=t`); a learned gate picks between them. BBS itself is just the fixed rule "emit iff cell==0" — here that rule is *learned*.
+
+![Conserving carrier — architecture](architecture_03_conserving_carrier.png)
+
+> The same left→right scan as Test 1, but the carrier is an integer ball-count `k`, and each cell may only **emit** (out=1, k→t−1) or **hold** (out=0, k→t) — the two moves that preserve `cell + carrier`. So conservation is structural; the gate only learns *when* to emit (which recovers BBS).
 
 ![Test 3](03_conserving_carrier.png)
 
