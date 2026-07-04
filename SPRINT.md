@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-04 18:03 UTC  
+**Generated:** 2026-07-04 23:47 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ✅ Good |
 | Active days | 5 / 7 |
-| Total commits | 27 |
+| Total commits | 28 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | **1** | **2** | ⚪ |
+| ⚪ | **7** | **6** | **11** | **1** | **3** | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -56,6 +56,7 @@
 
 **Sat – Saturday, Jul 4**
 
+- `6084242` diagrams: address code review — real BBS mapping, drop hard-coded %, hygiene — _dongzhang84_ `2026-07-04 16:47`
 - `c1f918a` docs: add Test 2 & Test 3 architecture diagrams — _dongzhang84_ `2026-07-04 11:03`
 - `0a26722` docs: add a side-by-side architecture diagram (Transformer vs carrier RNN) — _dongzhang84_ `2026-07-04 00:35`
 
