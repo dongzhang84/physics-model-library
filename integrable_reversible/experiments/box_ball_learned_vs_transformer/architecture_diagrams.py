@@ -7,13 +7,30 @@ Architecture schematics for the three models in this folder (static, no training
 
 Same task throughout: given a 0/1 Box-Ball state, predict it 2 steps later.
 """
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
+# The input row and its 2-step target shown on the diagrams use the REAL Box-Ball
+# rule (not hand-made numbers), so the input→output is checkable. The internal
+# boxes/arrows are schematic. IN is chosen so the 2-step target conserves within
+# the 5 displayed cells (no ball falls off the right edge).
+def _bbs_step(s):
+    out = np.zeros_like(s); c = 0
+    for i in range(len(s)):
+        if s[i] == 1: c += 1; out[i] = 0
+        elif c > 0:   out[i] = 1; c -= 1
+    return out
+def _bbs_run(s, T):
+    s = s.copy()
+    for _ in range(T): s = _bbs_step(s)
+    return s
+
 BLUE, GREEN, PURPLE, RED = "#2c3e50", "#1e8449", "#8e44ad", "#c0392b"
 TOK = [1.3, 2.9, 4.5, 6.1, 7.7]
-IN  = ["1", "1", "0", "1", "0"]
-OUT = ["0", "1", "1", "0", "1"]
+IN_BITS = [1, 0, 1, 0, 0]
+IN  = [str(b) for b in IN_BITS]
+OUT = [str(b) for b in _bbs_run(np.array(IN_BITS), 2)]   # = true BBS state 2 steps later
 
 def box(ax, x, y, w, h, text, fc, ec="#333", fs=10, bold=False):
     ax.add_patch(FancyBboxPatch((x - w/2, y - h/2), w, h,
@@ -67,7 +84,7 @@ def draw_01():
             ha="center", va="top", fontsize=9.5, color=GREEN)
     fig.suptitle("Test 1 — two models, same task: predict the Box-Ball state 2 steps ahead", fontsize=14, y=0.99)
     fig.tight_layout(rect=[0, 0.04, 1, 0.96]); fig.savefig("architecture_01_transformer_vs_carrier.png", dpi=140, bbox_inches="tight")
-    print("saved architecture_01_transformer_vs_carrier.png")
+    print("saved architecture_01_transformer_vs_carrier.png"); plt.close(fig)
 
 # ══════════════════════════ Test 2 ══════════════════════════
 def pair(ax, xa, xb, y0, y1, swap, c):
@@ -102,10 +119,10 @@ def draw_02():
         "a swap conserves the pair's count + is its own inverse, and  g  reads only FROZEN cells\n"
         "⇒ the whole stack is EXACTLY reversible & conservative — for any learned gate.",
         "#f7f0fb", ec=PURPLE, fs=9.5)
-    ax.text(4.5, -0.35, "but swaps are LOCAL — they can't express BBS's nonlocal left→right carrier  ⇒  couldn't learn it (accuracy stuck ~82%, the trivial baseline)",
+    ax.text(4.5, -0.35, "but swaps are LOCAL — they can't express BBS's nonlocal left→right carrier  ⇒  couldn't learn it (accuracy stuck at the trivial baseline)",
             ha="center", va="top", fontsize=9.5, color=RED)
     fig.tight_layout(rect=[0, 0.03, 1, 0.97]); fig.savefig("architecture_02_swap_automaton.png", dpi=140, bbox_inches="tight")
-    print("saved architecture_02_swap_automaton.png")
+    print("saved architecture_02_swap_automaton.png"); plt.close(fig)
 
 # ══════════════════════════ Test 3 ══════════════════════════
 def draw_03():
@@ -130,6 +147,7 @@ def draw_03():
     ax.text(4.5, -0.35, "cell + carrier preserved at EVERY step ⇒ conserves by construction ·  'emit iff cell==0' = BBS (learned)  ·  100% acc / 100% conserved / 100% reversible",
             ha="center", va="top", fontsize=9.5, color=GREEN)
     fig.tight_layout(rect=[0, 0.03, 1, 0.97]); fig.savefig("architecture_03_conserving_carrier.png", dpi=140, bbox_inches="tight")
-    print("saved architecture_03_conserving_carrier.png")
+    print("saved architecture_03_conserving_carrier.png"); plt.close(fig)
 
-draw_01(); draw_02(); draw_03()
+if __name__ == "__main__":
+    draw_01(); draw_02(); draw_03()
