@@ -44,6 +44,10 @@ The two "failures" weren't detours — they located the answer. #1 showed recurr
 
 Replace the hard-coded rule with a **learned** left→right carrier — a weight-shared recurrent cell with a small carrier state, trained on L=32, applied at any length. It learns the rule from data (never sees it); the hard-coded integrable line stays only as a ceiling.
 
+![Transformer vs the carrier RNN — architecture](architecture_diagram.png)
+
+> The two learned models side by side. **Transformer**: global self-attention — every output computed from the whole sequence at once, with no order, no carried state, and no conserved quantity. **Carrier**: one weight-shared cell scans left→right carrying a state `h` (like the BBS carrier, but learned), so it runs at any length. (Test 3's conserving carrier is this same scan with the emit/hold conservation constraint added.)
+
 ![Test 1](01_plain_carrier.png)
 
 | Length | all-zeros | Transformer acc / cons | Plain carrier acc / cons |
