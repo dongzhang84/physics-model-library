@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-03 07:27 UTC  
+**Generated:** 2026-07-04 07:35 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -9,13 +9,13 @@
 
 | Stat | Value |
 |------|-------|
-| Status | ⚠️ Slow |
-| Active days | 4 / 7 |
-| Total commits | 25 |
+| Status | ✅ Good |
+| Active days | 5 / 7 |
+| Total commits | 26 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | **1** | ⚪ | ⚪ |
+| ⚪ | **7** | **6** | **11** | **1** | **1** | ⚪ |
 
 **Tue – Tuesday, Jun 30**
 
@@ -53,6 +53,10 @@
 **Fri – Friday, Jul 3**
 
 - `1f4f651` proposal: sync with actual Route C progress — _dongzhang84_ `2026-07-03 00:27`
+
+**Sat – Saturday, Jul 4**
+
+- `0a26722` docs: add a side-by-side architecture diagram (Transformer vs carrier RNN) — _dongzhang84_ `2026-07-04 00:35`
 
 ---
 
