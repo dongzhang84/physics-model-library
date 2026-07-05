@@ -2,11 +2,13 @@
 
 **English** · [中文](README.zh-CN.md)
 
-Demo 2 showed a hard-coded integrable rule (the Box-Ball System, BBS) beating a Transformer on length extrapolation — but that was a **cheat**: the "integrable engine" *is* the rule that generated the labels, so its 100% is tautological. This folder removes the cheat and asks the real question:
+Demo 2 showed a hard-coded integrable rule (the Box-Ball System, BBS) doing what a Transformer can't on length extrapolation — but that was a **cheat**: the "integrable engine" *is* the rule that generated the labels, so its 100% is tautological. This folder removes the cheat and asks the real question:
 
-> Can a **genuinely trained** model, carrying an integrable-style inductive bias, beat a Transformer on the BBS length task — and add **exact conservation and reversibility**, by learning rather than by hard-coding?
+> Can **conservation (and reversibility) be made structural guarantees** — true by construction, not learned — and can a model then **genuinely learn, on top of that structure, a rule that extrapolates** to unseen lengths?
 
-**We ran 3 tests** — three iterations of the *same* investigation, not three separate experiments (hence one folder, files `01/02/03`). Together they are the proposal's "Route C" (a learned model with integrable structure). Answer: **yes — test 3 lands it.**
+**We ran 3 tests** — three iterations of the *same* investigation, not three separate experiments (hence one folder, files `01/02/03`). Together they are the proposal's "Route C" (a learned model with integrable structure). **Answer: yes — Test 3 lands it: conservation is structural (100% for any gate), and on top of it sits a genuinely-learned, length-extrapolating residual (a carrier-blind gate gets 89%, the learned gate 100%).**
+
+> **"Beating a Transformer" is *not* the headline.** Any model here with a left→right scan beats the structure-free Transformer on length extrapolation — but that is *expected*, overlaps the known "recurrent / state-tracking models extrapolate, attention doesn't" result, and is *not a fair fight* (the Transformer has no scan prior). It is kept only as a no-structure reference. The **fair, discriminating comparison is against other scan models — RNN / LSTM / Mamba (SSM) — where the question is *whose conserved quantity stays exact vs. drifts with length*, not whose accuracy is higher.** That is the thing structural conservation uniquely buys.
 
 ## The task
 
@@ -122,7 +124,9 @@ Reversibility of the learned conserving carrier (whole-sequence, mirror trick): 
 
 ## Where it stands / next
 
-This is the shape of the result the project aimed for: a genuinely trained model with an integrable-style bias that (i) beats the Transformer on OOD length, (ii) matches the hard-coded integrable ceiling on accuracy, and (iii) adds exact conservation and reversibility — reached by learning, not hard-coding. The next step is the **generality study** (same recipe on other reversible systems, multiple seeds, error bars) — the `data/reversible_systems/` plan in [`../../proposal.md`](../../proposal.md), and the step that turns this from a clean demo into a publishable result.
+**The result, stated honestly.** Conservation is made **structural** (true by construction, 100% for any gate); on top of that structure a model **genuinely learns a rule that extrapolates** to unseen lengths (Test 3: carrier-blind ≈ 89% vs learned 100%; conservation flat 100%; reversibility learned + verified). It reaches the hard-coded ceiling on accuracy **by learning, not hard-coding**. That — not "beating a Transformer" — is the claim.
+
+**Next step = the comparison that actually matters (a *fair* control, not the Transformer).** Run the same task against models that also have the left→right scan prior — **RNN / LSTM / Mamba (SSM)** — and compare the one thing structural conservation uniquely buys: **whose conserved quantity stays exact vs. drifts with length.** A free-emit scan drifts (Test 1's plain carrier already shows this: conservation falls off); the conserving carrier holds a flat 100%. Accuracy-beating the structure-free Transformer is expected and overlaps known results, so it stays a lower-bound reference only. Then scale up: **generality** across several reversible systems (finite-carrier BBS, Margolus CA, Toda) with multiple seeds and error bars — the `data/reversible_systems/` plan in [`../../proposal.md`](../../proposal.md) — is what turns this from a clean demo into a publishable result.
 
 ## Reproduce (CPU, a few minutes each)
 
