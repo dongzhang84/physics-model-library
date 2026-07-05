@@ -127,7 +127,7 @@ def draw_02():
 # ══════════════════════════ Test 3 ══════════════════════════
 def draw_03():
     fig, ax = plt.subplots(figsize=(11.5, 7.4)); ax.set_xlim(-0.3, 9.3); ax.set_ylim(0, 10); ax.axis("off")
-    ax.set_title("Test 3 — conserving carrier  ·  same left→right scan, but each step CONSERVES", fontsize=13, color=GREEN, pad=12)
+    ax.set_title("Test 3 — conserving carrier on finite-carrier BBS  ·  the emit decision must use the carrier", fontsize=12.5, color=GREEN, pad=12)
     tokens(ax, 0.9, IN, "#e2f0e6"); ax.text(4.5, 0.12, "input: 0/1 Box-Ball state", ha="center", fontsize=9, color="#666")
     cy = 3.3
     for x in TOK:
@@ -137,15 +137,15 @@ def draw_03():
     ax.annotate("", xy=(TOK[0]-0.58, cy), xytext=(0.5, cy), arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=1.7))
     for i in range(len(TOK)-1):
         ax.annotate("", xy=(TOK[i+1]-0.58, cy), xytext=(TOK[i]+0.58, cy), arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=1.7))
-    ax.text((TOK[0]+TOK[1])/2, cy+0.42, "carrier  k  =  #balls held  (integer)", ha="center", fontsize=8.5, color=GREEN, style="italic")
+    ax.text((TOK[0]+TOK[1])/2, cy+0.42, "carrier  k  =  #balls held  (0…K, capacity K)", ha="center", fontsize=8.5, color=GREEN, style="italic")
     tokens(ax, 5.55, OUT, "#e2f0e6"); ax.text(4.5, 6.2, "output: predicted state 2 steps later", ha="center", fontsize=9, color="#666")
     box(ax, 4.5, 8.35, 9.0, 1.35,
         "zoom · one cell —  total  t = cell + k  (a learned gate picks one of the only two count-preserving moves):\n"
         "EMIT → out=1, k→t−1        or        HOLD → out=0, k→t          (t=0 ⇒ forced HOLD)",
         "#f0faf2", ec=GREEN, fs=9.5)
     ax.annotate("", xy=(4.5, 7.68), xytext=(TOK[2], cy + 0.55), arrowprops=dict(arrowstyle="-", color=GREEN, lw=0.9, ls=":"))
-    ax.text(4.5, -0.35, "cell + carrier preserved at EVERY step ⇒ conserves by construction ·  'emit iff cell==0' = BBS (learned)  ·  100% acc / 100% conserved / 100% reversible",
-            ha="center", va="top", fontsize=9.5, color=GREEN)
+    ax.text(4.5, -0.35, "cell + carrier preserved at EVERY step ⇒ conserves by construction ·  emit must read k ('pass the ball when the carrier is full') — NON-trivial ·  learned 100% vs carrier-blind ~89%",
+            ha="center", va="top", fontsize=9.2, color=GREEN)
     fig.tight_layout(rect=[0, 0.03, 1, 0.97]); fig.savefig("architecture_03_conserving_carrier.png", dpi=140, bbox_inches="tight")
     print("saved architecture_03_conserving_carrier.png"); plt.close(fig)
 

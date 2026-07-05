@@ -90,24 +90,27 @@ Weld the guarantees. A stack of **gated swaps** of adjacent cells: a swap conser
 
 > Plain BBS was dropped: welding conservation into the carrier makes its rule *trivial* — a hard-coded `emit = 1 − cell` already scores 100% (nothing left to learn; see the audit table above). Finite-carrier BBS keeps the same structure but makes the rule non-trivial.
 
-*Design — verified in a quick check; the full run will replace `03_conserving_carrier.py`.*
+*Script: [`03_conserving_carrier.py`](03_conserving_carrier.py)*
 
-**The fix.** Keep everything that was good — the conserving-carrier structure (conservation stays **structural**), the length-extrapolation setup, the Transformer baseline — but change the **task** from plain BBS to **finite-carrier BBS**: the carrier (the basket) now holds at most **K balls**. When it is **full**, an arriving ball must **pass through** instead of being picked up. That one change makes the emit decision **depend on the carrier count `k`**, so `emit = 1 − cell` no longer works — the model is *forced* to learn to use the carrier.
+**The fix.** Keep everything that was good — the conserving-carrier structure (conservation stays **structural**), the length-extrapolation setup, the Transformer baseline — but change the **task** from plain BBS to **finite-carrier BBS**: the carrier (the basket) now holds at most **K balls** (here K=2). When it is **full**, an arriving ball must **pass through** instead of being picked up. That one change makes the emit decision **depend on the carrier count `k`**, so `emit = 1 − cell` no longer works — the model is *forced* to learn to use the carrier.
 
-Verified in a quick check (K=2, predict 2 steps, same conserving-carrier structure):
+![Test 3](03_conserving_carrier.png)
 
-| model | accuracy (OOD, L=48→128) | conserved | note |
-|---|---|---|---|
-| hard-coded finite-carrier rule | 100% | 100% | ceiling |
-| **carrier-blind gate** (`emit = 1 − cell`) | **~89%** | 100% | ← proves the residual is now **non-trivial** |
-| **conserving carrier (learned)** | **100%** | 100% | learns to use the carrier; holds to L=128 |
-| Transformer | collapses (expected) | ~0% | no structure |
+Trained on L=32, tested OOD (finite-carrier BBS verified conserved + reversible before training):
 
-- **Finite-carrier BBS is conserved + reversible** — both checked numerically over random configs (reversible via the mirror trick).
-- **Conservation stays structural** (`k' = t − out` bookkeeping → 100% for any gate) — the good half of the old design is kept.
-- **The learning is now real**: a carrier-blind gate tops out at **~89%**, while the learned gate reaches **100%** only by using the carrier (learning "pass through when the basket is full"). Training loss → ~0.003 (it *had* to learn something), vs plain-BBS's ~0.0001 (nothing to learn).
+| Length | ceiling (hard-coded) | carrier-blind (`emit=1−cell`) acc / cons | **conserving carrier (learned)** acc / cons | Transformer acc / cons |
+|---|---|---|---|---|
+| 32 (train) | 100 / 100 | 88.7 / 100 | **100 / 100** | 98.0 / 58.0 |
+| 48 | 100 / 100 | 89.5 / 100 | **100 / 100** | 90.0 / 2.7 |
+| 64 | 100 / 100 | 88.7 / 100 | **100 / 100** | 87.2 / 0.3 |
+| 96 | 100 / 100 | 88.8 / 100 | **100 / 100** | 85.1 / 0.0 |
+| 128 | 100 / 100 | 88.1 / 100 | **100 / 100** | 83.0 / 0.0 |
 
-**Still to build** (turns this design into a committed result): rewrite `03_conserving_carrier.py` for finite-carrier BBS and add the carrier-blind line to the figure; update the architecture diagram (carrier now finite → "pass when full"); fill this table from the committed run.
+Reversibility of the learned conserving carrier (whole-sequence, mirror trick): **100%**.
+
+- **The learning is real (not leaked)**: the carrier-blind gate `emit=1−cell` tops out at **~88–89%**; the learned gate reaches **100%** only by using the carrier (it learns "pass the ball through when the carrier is full"). That ~11% is the genuinely-learned part — on plain BBS the same gap was 0 (see appendix).
+- **Conservation stays structural**: both conserving models (blind and learned) hold **100%** at every length (`k'=t−out`), while the Transformer's conservation collapses (58% → 0%).
+- **Honest boundary**: this shows a non-trivial learnable residual on a conserving structure — it does **not** claim "no leak" (the carrier scan + conservation accounting are still hard-coded) or a "fair" win over the Transformer (see the audit table above).
 
 ---
 
