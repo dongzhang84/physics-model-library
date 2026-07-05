@@ -16,25 +16,19 @@ BBS is the ultradiscrete limit of KdV, an integrable cellular automaton on a 0/1
 
 > The `01/02/03` scripts train on random L=32 states like this one. Here a **size-3 soliton (fast) overtakes a size-1 and a size-2, passing _through_ them** — the order swaps, the sizes stay intact, and all 6 balls persist. The `input` (t=0) and `+2 = target` (t=2) rows are the pair the models actually see; the extra steps just show the dynamics. Made by [`bbs_data_l32.py`](bbs_data_l32.py).
 
-## The three tests at a glance
+## The three models — an honest audit (structure vs learning)
 
-| # | Model introduced | Idea | Outcome |
-|---|---|---|---|
-| 1 | plain carrier | remove the cheat: a learned left→right scan, rule learned not hard-coded | accuracy extrapolates; **conservation drifts** |
-| 2 | reversible swap-automaton | weld the guarantees: conservation & reversibility exact by construction | guarantees exact, but **can't learn** BBS |
-| 3 | **conserving carrier** | unite both: carrier reach + a per-site conservation constraint | ⚠️ on plain BBS the "learned 100/100/100" was **hollow (rule leaked)** → **redesigned on finite-carrier BBS**, see Test 3 |
+Same task (predict a Box-Ball state 2 steps ahead), three models. The question that matters is not "does it work" but **how much is hard-coded structure vs genuinely learned** — measured by replacing the learnable gate with a one-line fixed rule and seeing whether accuracy drops.
 
-**Punchline** — the models at OOD lengths:
+| model | what it is | learnable weights decide | conserved · reversible | genuinely learned? (fixed-rule audit) | honest claim |
+|---|---|---|---|---|---|
+| **Test 1 — plain carrier** | RNN: left→right scan + a generic 24-d hidden state; free-emit output | the whole cell (`net/out/hnext`); **no structural constraint** | conserved: **drifts** (not structural) · reversible: **no** | learns the *whole* rule (~92–99%) but doesn't conserve; a hard-coded `emit=1−cell` even beats it (100%) | "recurrence learns a rule & extrapolates" (overlaps known work); **no conservation** |
+| **Test 2 — swap-automaton** | stacked gated swaps of neighbor pairs; no carrier | only *swap / no-swap* per pair; the swaps are hard-coded | conserved · reversible: **both structural** (hold for any weight) | **can't learn**: fixed *and* learned gate both cap ~82% | "conservation + reversibility can be **fully structural**"; **can't learn the rule** |
+| **Test 3 — conserving carrier** (finite-carrier BBS) | carrier scan; `t=c+k`, `avail`, `k'=t−out` hard-coded | the emit gate only | conserved: **structural (per step)** · reversible: learned + verified | fixed `emit=1−cell` = **89%** vs learned = **100%** → **~11% genuinely learned** (on plain BBS this gap is **0**, which is why plain BBS was dropped) | "on a conserving structure a **non-trivial, extrapolating residual is genuinely learned**"; **NOT** "no leak / fair win over Transformer" |
 
-| model | accuracy (OOD) | conservation | reversible | learned? |
-|---|---|---|---|---|
-| Transformer | collapses (~81%) | ~0% | no | yes |
-| plain carrier | ~99% | drifts (76→39%) | no | yes |
-| reversible swap-automaton | ~82% (trivial) | 100% | 100% | yes |
-| **conserving carrier** (plain BBS) | 100% | 100% | 100% | ⚠️ leaked — see Test 3 |
-| hard-coded integrable | 100% | 100% | 100% | no (cheat) |
+**Where the structure-vs-learning line falls, unified.** Test 1 hard-codes only "causal scan + generic state" and learns the whole rule (but conservation drifts). Test 2 hard-codes swaps + conservation + reversibility and learns only "swap or not" (but can't express the rule). Test 3 hard-codes the carrier scan + conservation bookkeeping + capacity constraint and learns the emit decision — of which only the "pass the ball when the carrier is full" part (~11%) is non-trivial.
 
-The two "failures" weren't detours — they located the answer. #1 showed recurrence buys accuracy but not the invariant; #2 showed a guarantee that can't express the rule is worthless; #3 kept #1's reach and #2's discipline and *appeared* to get all three — **but on plain BBS the rule leaked (a hard-coded `emit = 1 − cell` already scores 100%), so Test 3 is redesigned on finite-carrier BBS, where the rule is genuinely non-trivial.**
+**Two caveats stated plainly.** (1) **Structural reversibility exists only in Test 2** — and Test 2 is exactly the one that can't learn; the models that learn (Test 1, Test 3) have only *learned + verified* reversibility. No single model yet has structural reversibility **and** learns the rule. (2) **None of them "fairly beats" a Transformer**: the win comes mostly from the left→right scan prior (which overlaps the known "recurrent / state-tracking extrapolates, attention doesn't" result). To make a "beats X" claim meaningful you'd compare against models with the *same* scan prior (RNN / SSM); the genuinely exclusive contribution then shrinks to the **structural conservation / reversibility guarantees**, not accuracy.
 
 ---
 
@@ -52,7 +46,7 @@ All three are drawn the same way — input at the bottom, the predicted state 2 
 
 **3 · Conserving carrier** — structure kept, task redesigned
 ![Conserving carrier](architecture_03_conserving_carrier.png)
-> The same left→right scan as #1, but the carrier is an integer ball-count `k` and each cell may only **emit** (out=1, k→t−1) or **hold** (out=0, k→t) — the two moves that preserve `cell + carrier`. Conservation is structural. (On plain BBS the "when to emit" rule was trivial — see the scrapped Test 3; the redesign runs this on **finite-carrier BBS**, where it isn't.)
+> The same left→right scan as #1, but the carrier is an integer ball-count `k` and each cell may only **emit** (out=1, k→t−1) or **hold** (out=0, k→t) — the two moves that preserve `cell + carrier`. Conservation is structural. (On plain BBS the "when to emit" rule was trivial; Test 3 runs this on **finite-carrier BBS**, where it isn't.)
 
 ---
 
@@ -92,11 +86,9 @@ Weld the guarantees. A stack of **gated swaps** of adjacent cells: a swap conser
 
 **Finding.** Conservation is a flat 100% and reversibility exact — the guarantees work. But the *local* swap structure **can't learn** BBS: accuracy stalls at ~82% (the trivial baseline), loss plateaus at 0.15 while the carrier reaches 0.02. BBS transport needs the carrier's nonlocal left→right reach, which a local gate lacks. **A structural guarantee that can't express the rule is worthless — the guarantee-vs-expressivity tension.**
 
-## ⛔ ~~Test 3 (old) — conserving carrier on plain BBS~~ — SCRAPPED: it leaks the rule
+## Test 3 — conserving carrier on *finite-carrier* BBS · a non-trivial rule to actually learn
 
-> **Why this was scrapped.** On plain BBS, welding conservation into the carrier makes the rule *trivial*: a **hard-coded gate `emit = 1 − cell`** — no learning, ignoring the carrier and the neighbors — **already scores 100% / 100% at every length**. So the old "learned conserving carrier hits 100/100/100" was **not a real learning result**: the architecture had essentially the whole BBS rule built in (carrier pickup + conservation + capacity), leaving only a one-bit negation to "learn". The structural guarantees were real; the *learning* was hollow. This section is replaced by the redesign below.
-
-## Test 3 (redesigned) — conserving carrier on *finite-carrier* BBS · a non-trivial rule to actually learn
+> Plain BBS was dropped: welding conservation into the carrier makes its rule *trivial* — a hard-coded `emit = 1 − cell` already scores 100% (nothing left to learn; see the audit table above). Finite-carrier BBS keeps the same structure but makes the rule non-trivial.
 
 *Design — verified in a quick check; the full run will replace `03_conserving_carrier.py`.*
 
@@ -122,7 +114,7 @@ Verified in a quick check (K=2, predict 2 steps, same conserving-carrier structu
 ## Honest boundaries
 
 1. **Single seed, toy scale, one task (BBS).** Numbers wobble across seeds (that is why the Transformer / carrier columns differ slightly between tests). A real version needs multiple seeds with mean ± error bars.
-2. **On plain BBS the conserving carrier *leaked the rule*** — a hard-coded `emit = 1 − cell` already hits 100% (see the scrapped Test 3 above), so that "learned" result was hollow. The **redesigned Test 3 (finite-carrier BBS)** fixes this: the residual is non-trivial (a carrier-blind gate ≈ 89%; the learned gate reaches 100% only by using the carrier). The broader open question is still **generality** — does the recipe hold across *several* reversible systems (finite-carrier BBS, Margolus CA, Toda), multi-seed?
+2. **On plain BBS the conserving carrier *leaked the rule*** — a hard-coded `emit = 1 − cell` already hits 100% (see the audit table above), so that "learned" result would be hollow. Test 3 therefore runs on **finite-carrier BBS**, where the residual is non-trivial (carrier-blind ≈ 89%; the learned gate reaches 100% only by using the carrier). The broader open question is still **generality** — does the recipe hold across *several* reversible systems (finite-carrier BBS, Margolus CA, Toda), multi-seed?
 3. **Global conservation relied on the carrier emptying** (it did, 100%); a flush would make it unconditional.
 
 ## Where it stands / next
