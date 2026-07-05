@@ -129,3 +129,13 @@ python 01_plain_carrier.py        # remove the cheat
 python 02_reversible_swap_ca.py   # weld guarantees (can't learn)
 python 03_conserving_carrier.py   # the one that works
 ```
+
+---
+
+## Appendix — the old Test 3 (done, then dropped; kept for the record)
+
+For the record: we first built and ran a conserving carrier on **plain (standard) BBS**. It scored 100% accuracy / 100% conservation / 100% reversible at every length — which looked like a clean "learned it" result, and it's why the earlier version of this folder called Test 3 a success.
+
+We dropped it (moving Test 3 to finite-carrier BBS) after the audit showed the result was **hollow**: replacing the learnable gate with a one-line fixed rule `emit = 1 − cell` (no training, ignoring the carrier and the neighbors) *also* scores 100% / 100% at every length. So the architecture had essentially the whole plain-BBS rule built in (carrier pickup + conservation + capacity), leaving only a trivial one-bit negation to "learn" — genuinely-learned ≈ 0. The structural guarantees were real; the *learning* was not.
+
+This is kept as a record of what was tried and why it was replaced — not a result we stand behind. (The `03_conserving_carrier.py` code path still targets plain BBS until the finite-carrier rewrite lands.)
