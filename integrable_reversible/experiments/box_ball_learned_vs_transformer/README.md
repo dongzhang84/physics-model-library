@@ -126,7 +126,22 @@ Reversibility of the learned conserving carrier (whole-sequence, mirror trick): 
 
 **The result, stated honestly.** Conservation is made **structural** (true by construction, 100% for any gate); on top of that structure a model **genuinely learns a rule that extrapolates** to unseen lengths (Test 3: carrier-blind ≈ 89% vs learned 100%; conservation flat 100%; reversibility learned + verified). It reaches the hard-coded ceiling on accuracy **by learning, not hard-coding**. That — not "beating a Transformer" — is the claim.
 
-**Next step = the comparison that actually matters (a *fair* control, not the Transformer).** Run the same task against models that also have the left→right scan prior — **RNN / LSTM / Mamba (SSM)** — and compare the one thing structural conservation uniquely buys: **whose conserved quantity stays exact vs. drifts with length.** A free-emit scan drifts (Test 1's plain carrier already shows this: conservation falls off); the conserving carrier holds a flat 100%. Accuracy-beating the structure-free Transformer is expected and overlaps known results, so it stays a lower-bound reference only. Then scale up: **generality** across several reversible systems (finite-carrier BBS, Margolus CA, Toda) with multiple seeds and error bars — the `data/reversible_systems/` plan in [`../../proposal.md`](../../proposal.md) — is what turns this from a clean demo into a publishable result.
+## Planned next tests (Test 4–6)
+
+The claim to establish is **not** "beats a Transformer" but "**structural conservation keeps the invariant exact where learning alone drifts.**" A quick scratch attempt at the fair comparison (not committed) surfaced a subtlety that shapes the plan:
+
+> **Key finding to build on.** On finite-carrier BBS (K=2), an LSTM and a plain RNN *also* reached 100% accuracy — and therefore 100% conservation; only a weaker SSM drifted. **Conservation drift is a symptom of imperfect accuracy, not of "no structural conservation": a model that learns the rule exactly conserves for free.** (This also explains why Test 1's RNN drifted — it only reached ~93% on *plain* BBS — while an RNN on finite-carrier BBS, whose carrier is bounded and so easier to track exactly, hits 100% and does not drift.)
+> **Tension this creates:** the task that makes a free-emit RNN drift (plain BBS, unbounded carrier) is exactly the one where the conserving carrier's residual is *trivial* (the leak); the task where the residual is non-trivial (finite-carrier BBS) is easy enough that the RNN nails it too. Test 4 has to escape both horns.
+
+**Test 4 — the fair comparison, in a regime that actually separates the models.** Conserving carrier vs **RNN / LSTM / Mamba (SSM)** (all scan-prior); Transformer kept only as a no-structure reference. The task must simultaneously (a) leave the conserving carrier a **non-trivial** residual to learn, and (b) be **hard enough that free-emit scan models can't hit 100% accuracy** at OOD length. Knobs to get there: larger carrier capacity K (bigger bounded state), longer prediction horizon T (harder for a direct-map LSTM than for a compose-single-step carrier), denser / bigger solitons, or a wider OOD gap (test to 256/512).
+- **Success** = a regime where RNN/LSTM/Mamba accuracy < 100% OOD → their conservation drifts, while the conserving carrier holds a flat 100% at ≥ their accuracy. *That* is the fair, exclusive claim.
+- **Failure** = if no reasonable regime produces it, **weaken the claim honestly**: structural conservation is a *safety net* that only matters when learning is imperfect — not a universal win over strong scan models.
+
+**Test 5 — generality (a second reversible system).** Recommended: Margolus-neighbourhood reversible CA. Same recipe (structural conservation + a learned residual) on a *different* system — validates "the recipe transfers" and the proposal's prediction that different systems need different structures. Worth doing only after Test 4 makes the claim stand.
+
+**Test 6 — rigor: multi-seed + error bars** on Test 3 and Test 4. Single-seed numbers wobble; this is the closing step before any write-up.
+
+**Order:** Test 4 → Test 5 → Test 6 — fix the foundation (make the claim actually hold) before building the second floor. Ties into the `data/reversible_systems/` plan in [`../../proposal.md`](../../proposal.md).
 
 ## Reproduce (CPU, a few minutes each)
 
