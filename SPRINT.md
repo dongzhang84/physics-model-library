@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-05 21:45 UTC  
+**Generated:** 2026-07-05 21:47 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ✅ Good |
 | Active days | 6 / 7 |
-| Total commits | 31 |
+| Total commits | 32 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | **1** | **4** | **2** |
+| ⚪ | **7** | **6** | **11** | **1** | **4** | **3** |
 
 **Tue – Tuesday, Jun 30**
 
@@ -63,6 +63,7 @@
 
 **Sun – Sunday, Jul 5**
 
+- `26c68a5` docs: record the old Test 3 as an appendix (kept, not deleted) — _dongzhang84_ `2026-07-05 14:47`
 - `c95ec47` docs: remove old Test 3, add the structure-vs-learning audit table to the README — _dongzhang84_ `2026-07-05 14:45`
 - `e9efe90` docs: scrap the leaky Test 3, write in the finite-carrier BBS redesign — _dongzhang84_ `2026-07-05 10:36`
 
