@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-05 22:12 UTC  
+**Generated:** 2026-07-05 23:50 UTC  
 **Showing:** last 2 week(s) of 2 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ✅ Good |
 | Active days | 6 / 7 |
-| Total commits | 34 |
+| Total commits | 35 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | **1** | **4** | **5** |
+| ⚪ | **7** | **6** | **11** | **1** | **4** | **6** |
 
 **Tue – Tuesday, Jun 30**
 
@@ -63,6 +63,7 @@
 
 **Sun – Sunday, Jul 5**
 
+- `1a1162c` docs: write the Test 4-6 plan into the README (no code run) — _dongzhang84_ `2026-07-05 16:49`
 - `a4906e3` docs: reframe the core claim away from 'beat Transformer' — _dongzhang84_ `2026-07-05 15:12`
 - `48367ed` experiments: build & run the finite-carrier Test 3 (real result) — _dongzhang84_ `2026-07-05 14:53`
 - `26c68a5` docs: record the old Test 3 as an appendix (kept, not deleted) — _dongzhang84_ `2026-07-05 14:47`
