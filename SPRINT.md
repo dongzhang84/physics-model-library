@@ -1,21 +1,35 @@
 # Sprint Report
 
-**Generated:** 2026-07-05 23:50 UTC  
-**Showing:** last 2 week(s) of 2 total  
+**Generated:** 2026-07-06 03:52 UTC  
+**Showing:** last 3 week(s) of 3 total  
 
 ---
 
-## Week 2 _(current)_ · 2026-06-29 to 2026-07-05
+## Week 3 _(current)_ · 2026-07-06 to 2026-07-12
+
+| Stat | Value |
+|------|-------|
+| Status | ❌ Stalled |
+| Active days | 0 / 7 |
+| Total commits | 0 |
+
+| Mon | Tue | Wed | Thu | Fri | Sat | Sun |
+|---|---|---|---|---|---|---|
+| ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+
+---
+
+## Week 2 · 2026-06-29 to 2026-07-05
 
 | Stat | Value |
 |------|-------|
 | Status | ✅ Good |
 | Active days | 6 / 7 |
-| Total commits | 35 |
+| Total commits | 36 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | **1** | **4** | **6** |
+| ⚪ | **7** | **6** | **11** | **1** | **4** | **7** |
 
 **Tue – Tuesday, Jun 30**
 
@@ -63,6 +77,7 @@
 
 **Sun – Sunday, Jul 5**
 
+- `18ca9f7` experiments: Test 4 — fair comparison vs scan models (RNN/LSTM/Mamba), honest — _dongzhang84_ `2026-07-05 20:52`
 - `1a1162c` docs: write the Test 4-6 plan into the README (no code run) — _dongzhang84_ `2026-07-05 16:49`
 - `a4906e3` docs: reframe the core claim away from 'beat Transformer' — _dongzhang84_ `2026-07-05 15:12`
 - `48367ed` experiments: build & run the finite-carrier Test 3 (real result) — _dongzhang84_ `2026-07-05 14:53`
