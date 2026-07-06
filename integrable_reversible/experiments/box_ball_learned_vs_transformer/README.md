@@ -116,6 +116,31 @@ Reversibility of the learned conserving carrier (whole-sequence, mirror trick): 
 
 ---
 
+## Test 4 — fair comparison vs scan models (RNN / LSTM / Mamba)
+
+*Script: [`04_scan_baselines.py`](04_scan_baselines.py). **Single seed — a trend signal, not a conclusion** (multi-seed deferred to a final batch, per Tests 1–3).*
+
+"Beating a Transformer" is expected and unfair (it has no scan prior), so the real test is against models that **also** scan left→right — a plain RNN, an LSTM, and a minimal diagonal SSM (a Mamba-family stand-in). The question is the one thing structural conservation could uniquely buy: **whose conserved quantity stays exact vs. drifts with length.** Because conservation drift is a symptom of imperfect accuracy, the task is pushed to a harder regime — finite-carrier BBS with a **bigger bounded carrier (K=6)**, tested out to L=256 — so the free-emit models can't simply learn it perfectly.
+
+![Test 4](04_scan_baselines.png)
+
+| model (K=6) | acc / cons @32 | @64 | @128 | @256 |
+|---|---|---|---|---|
+| **conserving carrier** | **100 / 100** | **100 / 100** | **100 / 100** | **100 / 100** |
+| LSTM | 100 / 100 | 97 / 45 | 93 / 13 | 91 / 10 |
+| SSM (Mamba-family) | 97 / 49 | 95 / 13 | 93 / 1 | 91 / 0 |
+| plain carrier (RNN, small) | 80 / 0 | 75 / 0 | 73 / 0 | 73 / 0 |
+| plain carrier (RNN, big) | 27 / 0 | 28 / 0 | 28 / 0 | 28 / 0 |
+| Transformer (ref) | 99 / 76 | 71 / 0 | 68 / 0 | 67 / 0 |
+
+**What this shows (honest).**
+- **LSTM and the SSM learn the rule in-distribution (LSTM 100/100 at L=32) but their conservation drifts to ~0–10% out of distribution**, while the **conserving carrier holds a flat 100/100.** Mechanism: it gets the integer carrier *structurally* (it only learns the threshold `emit=[k≥K]`), whereas the free-emit models must *learn to maintain the counter* and their small errors accumulate over length. **Against these standard direct-map scan models, structural conservation is the differentiator.**
+- **The custom plain-carrier RNN is not a usable baseline here** (reported for full disclosure): at K=6 the small one collapses (80% in-distribution) and the *bigger, longer-trained* one is **worse** (27%) — a **training-instability artifact of a hand-rolled unrolled RNN, not a capacity or representational limit.** No claim rests on it. (At the easier K=3 it trained fine and *tied* — a composing model that learns the step exactly conserves too.)
+
+**Claim boundary (deliberately narrow).** Supported: *vs standard direct-map scan sequence models (LSTM, Mamba-family), structural conservation keeps the invariant exact out of distribution where they drift.* **Not** supported: a win over *all* scan models — a composing-single-step model that learns the step exactly would conserve too (the plain carrier did at K=3); we simply couldn't train such a free-emit model at K=6. Single seed → trend only.
+
+---
+
 ## Honest boundaries
 
 1. **Single seed, toy scale, one task (BBS).** Numbers wobble across seeds (that is why the Transformer / carrier columns differ slightly between tests). A real version needs multiple seeds with mean ± error bars.
@@ -133,9 +158,7 @@ The claim to establish is **not** "beats a Transformer" but "**structural conser
 > **Key finding to build on.** On finite-carrier BBS (K=2), an LSTM and a plain RNN *also* reached 100% accuracy — and therefore 100% conservation; only a weaker SSM drifted. **Conservation drift is a symptom of imperfect accuracy, not of "no structural conservation": a model that learns the rule exactly conserves for free.** (This also explains why Test 1's RNN drifted — it only reached ~93% on *plain* BBS — while an RNN on finite-carrier BBS, whose carrier is bounded and so easier to track exactly, hits 100% and does not drift.)
 > **Tension this creates:** the task that makes a free-emit RNN drift (plain BBS, unbounded carrier) is exactly the one where the conserving carrier's residual is *trivial* (the leak); the task where the residual is non-trivial (finite-carrier BBS) is easy enough that the RNN nails it too. Test 4 has to escape both horns.
 
-**Test 4 — the fair comparison, in a regime that actually separates the models.** Conserving carrier vs **RNN / LSTM / Mamba (SSM)** (all scan-prior); Transformer kept only as a no-structure reference. The task must simultaneously (a) leave the conserving carrier a **non-trivial** residual to learn, and (b) be **hard enough that free-emit scan models can't hit 100% accuracy** at OOD length. Knobs to get there: larger carrier capacity K (bigger bounded state), longer prediction horizon T (harder for a direct-map LSTM than for a compose-single-step carrier), denser / bigger solitons, or a wider OOD gap (test to 256/512).
-- **Success** = a regime where RNN/LSTM/Mamba accuracy < 100% OOD → their conservation drifts, while the conserving carrier holds a flat 100% at ≥ their accuracy. *That* is the fair, exclusive claim.
-- **Failure** = if no reasonable regime produces it, **weaken the claim honestly**: structural conservation is a *safety net* that only matters when learning is imperfect — not a universal win over strong scan models.
+**Test 4 — ✅ done (see the [Test 4](#test-4--fair-comparison-vs-scan-models-rnn--lstm--mamba) section above).** Outcome, single seed: at a harder regime (K=6), **LSTM and the Mamba-family SSM drift on conservation OOD (→ ~0–10%) while the conserving carrier holds 100%** — so the claim stands *vs standard direct-map scan models*. The custom composing-RNN baseline was training-unstable at K=6 (uninformative), so the win is **not** claimed over all scan models. To harden it: a fair, stably-trained composing free-emit baseline at high K, and multi-seed (Test 6).
 
 **Test 5 — generality (a second reversible system).** Recommended: Margolus-neighbourhood reversible CA. Same recipe (structural conservation + a learned residual) on a *different* system — validates "the recipe transfers" and the proposal's prediction that different systems need different structures. Worth doing only after Test 4 makes the claim stand.
 
