@@ -110,7 +110,7 @@ Trained on L=32, tested OOD (finite-carrier BBS verified conserved + reversible 
 
 Reversibility of the learned conserving carrier (whole-sequence, mirror trick): **100%**.
 
-- **The learning is real (not leaked)**: the carrier-blind gate `emit=1−cell` tops out at **~88–89%**; the learned gate reaches **100%** only by using the carrier (it learns "pass the ball through when the carrier is full"). That ~11% is the genuinely-learned part — on plain BBS the same gap was 0 (see appendix).
+- **The learning is real (not leaked)**: the carrier-blind gate `emit=1−cell` tops out at **~89%**; the learned gate does better only by using the carrier ("pass the ball through when the carrier is full"). *This single-seed run shows 100%, but across 5 seeds the learned gate averages **94 ± 5%** — a **~4-point** edge over carrier-blind that is within noise (see [Test 5](#test-5--multi-seed-rigor-5-seeds)). At K=2 the genuinely-robust win is the **conservation (100 ± 0)**, not the accuracy edge; the edge is clean and large only at K=6 (Test 4).* On plain BBS the same gap was 0 (see appendix).
 - **Conservation stays structural**: both conserving models (blind and learned) hold **100%** at every length (`k'=t−out`), while the Transformer's conservation collapses (58% → 0%).
 - **Honest boundary**: this shows a non-trivial learnable residual on a conserving structure — it does **not** claim "no leak" (the carrier scan + conservation accounting are still hard-coded) or a "fair" win over the Transformer (see the audit table above).
 
@@ -143,6 +143,52 @@ Mechanism: the conserving carrier only learns the threshold `emit=[k≥K]` — t
 
 ---
 
+## Test 5 — multi-seed rigor (5 seeds): the formal numbers
+
+Every table in Tests 1–4 above is a **single seed** (trend illustration). Here each test is re-run across **5 seeds** and reported as **mean ± std** — the numbers of record. *Script: [`05_multiseed.py`](05_multiseed.py) → error-bar figures `05_test{1..4}.png`, raw `multiseed_results.json`.*
+
+**What multi-seed corrected (the honest part):**
+1. **Test 3 was over-optimistic on accuracy.** The conserving carrier's accuracy is **94 ± 5%**, not the single-seed 100%, and the learned-vs-carrier-blind gap shrinks from 11 pts to **~4 pts (94 vs 90) — within noise.** What is rock-solid is the **structural conservation: 100 ± 0** at every length. So at K=2 the robust win is the conservation *guarantee*, not a large learned-accuracy edge.
+2. **Tests 1 & 2: the plain carrier's conservation is highly seed-variable** (std **±22–44**) — it drifts on average but some seeds conserve far better than others; not a clean story. The **swap-automaton is stable** (~82 ± 1% acc, 100 ± 0 conservation).
+3. **Test 4 (K=6) is the robust, strong result** (low variance): conserving carrier **100 ± 0 / 100 ± 0**; GRU, LSTM, SSM all drift on conservation OOD. This is where structural conservation clearly and reliably wins.
+
+**Test 1** (plain BBS) ![](05_test1.png)
+
+| acc / cons | @32 | @48 | @64 | @96 | @128 |
+|---|---|---|---|---|---|
+| plain carrier | 90±6 / 26±33 | 89±6 / 22±32 | 89±6 / 20±30 | 88±6 / 16±26 | 88±6 / 13±22 |
+| Transformer | 97±1 / 47±8 | 84±1 / 15±6 | 82±1 / 5±6 | 80±1 / 0±0 | 79±2 / 0±1 |
+
+**Test 2** (plain BBS) ![](05_test2.png)
+
+| acc / cons | @32 | @48 | @64 | @96 | @128 |
+|---|---|---|---|---|---|
+| swap-automaton | 84±1 / **100±0** | 83±1 / 100±0 | 82±1 / 100±0 | 82±1 / 100±0 | 81±1 / 100±0 |
+| plain carrier | 96±5 / 63±39 | 95±6 / 54±40 | 95±6 / 50±42 | 95±6 / 44±43 | 95±6 / 42±44 |
+| Transformer | 95±1 / 44±8 | 84±2 / 10±6 | 80±3 / 7±5 | 80±2 / 2±3 | 78±3 / 2±2 |
+
+**Test 3** (finite-carrier K=2) ![](05_test3.png)
+
+| acc / cons | @32 | @48 | @64 | @96 | @128 |
+|---|---|---|---|---|---|
+| conserving carrier | 94±5 / **100±0** | 94±5 / 100±0 | 94±5 / 100±0 | 94±5 / 100±0 | 93±6 / 100±0 |
+| carrier-blind | 90±0 / 100±0 | 89±0 / 100±0 | 89±0 / 100±0 | 88±0 / 100±0 | 88±0 / 100±0 |
+| Transformer | 99±0 / 82±7 | 92±1 / 8±2 | 88±1 / 2±2 | 85±1 / 0±1 | 83±2 / 0±0 |
+
+**Test 4** (finite-carrier K=6) ![](05_test4.png)
+
+| acc / cons | @32 | @64 | @128 | @256 |
+|---|---|---|---|---|
+| **conserving carrier** | **100±0 / 100±0** | **100±0 / 100±0** | **100±0 / 100±0** | **100±0 / 100±0** |
+| GRU carrier (compose) | 88±0 / 15±4 | 79±1 / 4±3 | 79±1 / 1±1 | 79±0 / 0±0 |
+| LSTM | 100±0 / 100±0 | 97±0 / 39±9 | 93±0 / 12±7 | 91±1 / 6±5 |
+| SSM (Mamba-family) | 96±1 / 38±15 | 94±1 / 16±9 | 92±1 / 2±2 | 91±1 / 0±0 |
+| Transformer (ref) | 97±1 / 62±6 | 63±7 / 8±6 | 58±8 / 3±4 | 64±4 / 0±1 |
+
+**Bottom line after multi-seed:** the **robust** claim is *structural conservation stays exact (100 ± 0) where free-emit scan models drift* — strongest and cleanest at Test 4 (K=6). The *learned-accuracy* edge is real but modest/noisy at K=2 (Test 3) and clean at K=6 (Test 4). Still one task family (BBS); cross-system generality is Test 6.
+
+---
+
 ## Honest boundaries
 
 1. **Single seed, toy scale, one task (BBS).** Numbers wobble across seeds (that is why the Transformer / carrier columns differ slightly between tests). A real version needs multiple seeds with mean ± error bars.
@@ -162,11 +208,11 @@ The claim to establish is **not** "beats a Transformer" but "**structural conser
 
 **Test 4 — ✅ done (see the [Test 4](#test-4--fair-comparison-vs-scan-models-rnn--lstm--mamba) section above).** Single seed: at a harder regime (K=6), **both a composing free-emit GRU and direct-map models (LSTM, Mamba-family SSM) fail to match the conserving carrier** — the GRU can't fully learn the rule (89% in-dist) and its conservation collapses; the LSTM learns in-dist but drifts OOD; the conserving carrier holds 100/100. Claim: *at matched budget, standard free-emit scan models (composing + direct-map) don't match structural conservation's accuracy + conservation — an efficiency + guarantee advantage* (not "impossible for any net"). Remaining rigor: multi-seed (Test 6).
 
-**Test 5 — generality (a second reversible system).** Recommended: Margolus-neighbourhood reversible CA. Same recipe (structural conservation + a learned residual) on a *different* system — validates "the recipe transfers" and the proposal's prediction that different systems need different structures. Worth doing only after Test 4 makes the claim stand.
+**Test 5 — ✅ done: multi-seed rigor (see the [Test 5](#test-5--multi-seed-rigor-5-seeds) section above).** All four tests re-run across 5 seeds → mean ± std. It corrected the Test 3 single-seed accuracy (100 → 94±5) and shrank the learned-vs-blind gap to ~4 pts, while confirming the robust result: structural conservation stays 100 ± 0 where free-emit models drift (cleanest at Test 4, K=6).
 
-**Test 6 — rigor: multi-seed + error bars** on Test 3 and Test 4. Single-seed numbers wobble; this is the closing step before any write-up.
+**Test 6 — generality (a second reversible system).** Recommended: Margolus-neighbourhood reversible CA. Same recipe (structural conservation + a learned residual) on a *different* system — validates "the recipe transfers" and the proposal's prediction that different systems need different structures. This is the next experiment.
 
-**Order:** Test 4 → Test 5 → Test 6 — fix the foundation (make the claim actually hold) before building the second floor. Ties into the `data/reversible_systems/` plan in [`../../proposal.md`](../../proposal.md).
+**Order:** Test 4 (done) → Test 5 multi-seed (done) → Test 6 generality (next) — foundation first, then the second floor. Ties into the `data/reversible_systems/` plan in [`../../proposal.md`](../../proposal.md).
 
 ## Reproduce (CPU, a few minutes each)
 
