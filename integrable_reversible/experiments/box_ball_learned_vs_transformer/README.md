@@ -191,19 +191,33 @@ Every table in Tests 1–4 above is a **single seed** (trend illustration). Here
 
 ## Honest boundaries
 
-1. **Single seed, toy scale, one task (BBS).** Numbers wobble across seeds (that is why the Transformer / carrier columns differ slightly between tests). A real version needs multiple seeds with mean ± error bars.
+1. **Toy scale, one task (BBS).** Tests 1–4 are now re-run across 5 seeds (Test 5) with mean ± std, so the headline is no longer single-seed luck — but it is still one small task family at toy scale, a single 5-seed batch.
 2. **On plain BBS the conserving carrier *leaked the rule*** — a hard-coded `emit = 1 − cell` already hits 100% (see the audit table above), so that "learned" result would be hollow. Test 3 therefore runs on **finite-carrier BBS**, where the residual is non-trivial (carrier-blind ≈ 89%; the learned gate reaches 100% only by using the carrier). The broader open question is still **generality** — does the recipe hold across *several* reversible systems (finite-carrier BBS, Margolus CA, Toda), multi-seed?
 3. **Global conservation relied on the carrier emptying** (it did, 100%); a flush would make it unconditional.
 
 ## Conclusion
 
-Five tests, one task family (the Box-Ball System). The question: can an integrable-style structure be *learned* (not hard-coded) and buy something a plain sequence model can't?
+**What we did.** On the simplest integrable system (the Box-Ball System) we tested one thing: does welding an integrable invariant — **conservation** — into a network's *structure*, rather than hoping it is learned, actually help? Task: given a 0/1 state, predict it after a few steps; train on short sequences (L=32), test on long ones (out to L=256), and see who extrapolates. Five tests, all multi-seed.
 
-- **The robust result is structural conservation.** The conserving carrier makes ball-count conservation exact *by construction* (`k' = t − out`); across 5 seeds it holds **100 ± 0** at every length, while free-emit scan models — a composing GRU, an LSTM, and a Mamba-family SSM — drift as length grows (cleanest at K=6: conserving carrier 100 ± 0, the others → ~0). That is an **efficiency + guarantee** edge *among scan models* — not a win over a structure-free Transformer (expected and unfair; kept only as a reference).
-- **The learned residual is real but modest.** On finite-carrier BBS the model genuinely learns to use the carrier (a carrier-blind gate can't match it), but multi-seed shrinks that accuracy edge to ~4 points at K=2 (94 ± 5 vs 89); it is clean and large only at the harder K=6.
-- **What we deliberately do NOT claim:** not "beats a Transformer"; not "no leak" (the carrier scan + conservation bookkeeping are hard-coded — see the scrapped-then-fixed Test 3 in the appendix); not "learned the whole rule from scratch." The honest headline is narrow, and it survives multiple seeds.
+**The best model — the "conserving carrier."** A left→right recurrent scan with a built-in counter (the carrier) whose only per-step actions are *emit a ball* or *hold* — and **both actions leave the total ball-count unchanged by construction** (`k' = t − out`). Conservation is therefore true for **any** gate; the network only has to learn *when* to emit (a small gate over `cell, carrier-count, two neighbours` — it never has to learn *to count*).
 
-**Scope.** One reversible system (BBS), toy scale, a single 5-seed batch. Whether the same "structural conservation + learned residual" recipe transfers to *other* reversible systems (Margolus CA, Toda, …) is the natural next question — but that is a **separate** experiment, not part of this one.
+**The best result (Test 4, the harder K=6 regime), 5 seeds, L=32 → L=256:**
+
+| model | accuracy (in-dist → OOD) | conservation (in-dist → OOD) |
+|---|---|---|
+| **conserving carrier** | **100 → 100** | **100 → 100** (never drifts) |
+| LSTM | 100 → 91 | 100 → 6 |
+| SSM (Mamba-family) | 96 → 91 | 38 → 0 |
+| GRU (composing) | 88 → 79 | 15 → 0 |
+| Transformer (ref) | 97 → 64 | 62 → 0 |
+
+**Why it wins — the mechanism, stated plainly.**
+
+1. **Conservation is decoupled from accuracy.** For the conserving carrier the invariant is structural, so it stays exact *whether or not the gate is perfect*. For every free-emit model the only way to conserve is to be *accurate everywhere* — the LSTM makes this vivid: it conserves 100% exactly where it is 100% accurate (in-dist), and its conservation collapses exactly where its accuracy decays (OOD). **Conservation drift is a symptom of imperfect accuracy; structural conservation removes the symptom outright.**
+2. **The structural counter also makes the rule easier to learn *exactly*.** Because the carrier count is maintained by construction, the network only fits a small emit-gate — and that gate extrapolates (100% at L=256). GRU / LSTM / SSM must instead carry the counter *inside their hidden state*; small errors accumulate over length, so their accuracy — and with it their conservation — decays.
+3. **The Transformer has no scan at all,** so it is worst on both axes. It is an unfair, no-structure reference — **not** the headline (any scan model beats it, which merely reproduces the known "recurrent/state-tracking extrapolates, attention doesn't" result).
+
+**Honest boundaries.** (a) This is a *guarantee + efficiency* advantage **among scan models**, not "no network can ever do it." (b) The purely *learned* accuracy edge is large and clean only at K=6; at the easier K=2 it shrinks to ~4 points (Test 3: 94 ± 5 vs 89). (c) The carrier scan and conservation bookkeeping are hard-coded — the network learns the residual, not the whole rule from scratch (see the scrapped-then-fixed Test 3 in the appendix). (d) One reversible system, toy scale, a single 5-seed batch. Whether the same recipe transfers to *other* reversible systems (Margolus CA, Toda, …) is a **separate** future experiment, not part of this one.
 
 ## Reproduce (CPU, a few minutes each)
 
