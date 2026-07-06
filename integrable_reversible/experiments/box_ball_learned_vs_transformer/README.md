@@ -1,4 +1,4 @@
-# Learning an integrable model on the Box-Ball System (3 tests)
+# Learning an integrable model on the Box-Ball System (5 tests)
 
 **English** · [中文](README.zh-CN.md)
 
@@ -6,7 +6,7 @@ Demo 2 showed a hard-coded integrable rule (the Box-Ball System, BBS) doing what
 
 > Can **conservation (and reversibility) be made structural guarantees** — true by construction, not learned — and can a model then **genuinely learn, on top of that structure, a rule that extrapolates** to unseen lengths?
 
-**We ran 3 tests** — three iterations of the *same* investigation, not three separate experiments (hence one folder, files `01/02/03`). Together they are the proposal's "Route C" (a learned model with integrable structure). **Answer: yes — Test 3 lands it: conservation is structural (100% for any gate), and on top of it sits a genuinely-learned, length-extrapolating residual (a carrier-blind gate gets 89%, the learned gate 100%).**
+**We ran 5 tests** (files `01`–`05`, one folder). Tests 1–3 build the model step by step (remove the cheat → weld the guarantees → the conserving carrier that actually learns); Test 4 pits it fairly against RNN / LSTM / Mamba; Test 5 re-runs all four across 5 seeds for formal mean ± std numbers. Together they are the proposal's "Route C" (a learned model with integrable structure). **Answer, stated with the multi-seed numbers: yes — conservation is made structural and stays 100 ± 0 where free-emit scan models drift; on top of it sits a genuinely-learned residual (real, though modest at K=2). See the [Conclusion](#conclusion).**
 
 > **"Beating a Transformer" is *not* the headline.** Any model here with a left→right scan beats the structure-free Transformer on length extrapolation — but that is *expected*, overlaps the known "recurrent / state-tracking models extrapolate, attention doesn't" result, and is *not a fair fight* (the Transformer has no scan prior). It is kept only as a no-structure reference. The **fair, discriminating comparison is against other scan models — RNN / LSTM / Mamba (SSM) — where the question is *whose conserved quantity stays exact vs. drifts with length*, not whose accuracy is higher.** That is the thing structural conservation uniquely buys.
 
@@ -185,7 +185,7 @@ Every table in Tests 1–4 above is a **single seed** (trend illustration). Here
 | SSM (Mamba-family) | 96±1 / 38±15 | 94±1 / 16±9 | 92±1 / 2±2 | 91±1 / 0±0 |
 | Transformer (ref) | 97±1 / 62±6 | 63±7 / 8±6 | 58±8 / 3±4 | 64±4 / 0±1 |
 
-**Bottom line after multi-seed:** the **robust** claim is *structural conservation stays exact (100 ± 0) where free-emit scan models drift* — strongest and cleanest at Test 4 (K=6). The *learned-accuracy* edge is real but modest/noisy at K=2 (Test 3) and clean at K=6 (Test 4). Still one task family (BBS); cross-system generality is Test 6.
+**Bottom line after multi-seed:** the **robust** claim is *structural conservation stays exact (100 ± 0) where free-emit scan models drift* — strongest and cleanest at Test 4 (K=6). The *learned-accuracy* edge is real but modest/noisy at K=2 (Test 3) and clean at K=6 (Test 4). Still one task family (BBS); cross-system generality is a separate future experiment (see the Conclusion).
 
 ---
 
@@ -195,24 +195,15 @@ Every table in Tests 1–4 above is a **single seed** (trend illustration). Here
 2. **On plain BBS the conserving carrier *leaked the rule*** — a hard-coded `emit = 1 − cell` already hits 100% (see the audit table above), so that "learned" result would be hollow. Test 3 therefore runs on **finite-carrier BBS**, where the residual is non-trivial (carrier-blind ≈ 89%; the learned gate reaches 100% only by using the carrier). The broader open question is still **generality** — does the recipe hold across *several* reversible systems (finite-carrier BBS, Margolus CA, Toda), multi-seed?
 3. **Global conservation relied on the carrier emptying** (it did, 100%); a flush would make it unconditional.
 
-## Where it stands / next
+## Conclusion
 
-**The result, stated honestly.** Conservation is made **structural** (true by construction, 100% for any gate); on top of that structure a model **genuinely learns a rule that extrapolates** to unseen lengths (Test 3: carrier-blind ≈ 89% vs learned 100%; conservation flat 100%; reversibility learned + verified). It reaches the hard-coded ceiling on accuracy **by learning, not hard-coding**. That — not "beating a Transformer" — is the claim.
+Five tests, one task family (the Box-Ball System). The question: can an integrable-style structure be *learned* (not hard-coded) and buy something a plain sequence model can't?
 
-## Planned next tests (Test 4–6)
+- **The robust result is structural conservation.** The conserving carrier makes ball-count conservation exact *by construction* (`k' = t − out`); across 5 seeds it holds **100 ± 0** at every length, while free-emit scan models — a composing GRU, an LSTM, and a Mamba-family SSM — drift as length grows (cleanest at K=6: conserving carrier 100 ± 0, the others → ~0). That is an **efficiency + guarantee** edge *among scan models* — not a win over a structure-free Transformer (expected and unfair; kept only as a reference).
+- **The learned residual is real but modest.** On finite-carrier BBS the model genuinely learns to use the carrier (a carrier-blind gate can't match it), but multi-seed shrinks that accuracy edge to ~4 points at K=2 (94 ± 5 vs 89); it is clean and large only at the harder K=6.
+- **What we deliberately do NOT claim:** not "beats a Transformer"; not "no leak" (the carrier scan + conservation bookkeeping are hard-coded — see the scrapped-then-fixed Test 3 in the appendix); not "learned the whole rule from scratch." The honest headline is narrow, and it survives multiple seeds.
 
-The claim to establish is **not** "beats a Transformer" but "**structural conservation keeps the invariant exact where learning alone drifts.**" A quick scratch attempt at the fair comparison (not committed) surfaced a subtlety that shapes the plan:
-
-> **Key finding to build on.** On finite-carrier BBS (K=2), an LSTM and a plain RNN *also* reached 100% accuracy — and therefore 100% conservation; only a weaker SSM drifted. **Conservation drift is a symptom of imperfect accuracy, not of "no structural conservation": a model that learns the rule exactly conserves for free.** (This also explains why Test 1's RNN drifted — it only reached ~93% on *plain* BBS — while an RNN on finite-carrier BBS, whose carrier is bounded and so easier to track exactly, hits 100% and does not drift.)
-> **Tension this creates:** the task that makes a free-emit RNN drift (plain BBS, unbounded carrier) is exactly the one where the conserving carrier's residual is *trivial* (the leak); the task where the residual is non-trivial (finite-carrier BBS) is easy enough that the RNN nails it too. Test 4 has to escape both horns.
-
-**Test 4 — ✅ done (see the [Test 4](#test-4--fair-comparison-vs-scan-models-rnn--lstm--mamba) section above).** Single seed: at a harder regime (K=6), **both a composing free-emit GRU and direct-map models (LSTM, Mamba-family SSM) fail to match the conserving carrier** — the GRU can't fully learn the rule (89% in-dist) and its conservation collapses; the LSTM learns in-dist but drifts OOD; the conserving carrier holds 100/100. Claim: *at matched budget, standard free-emit scan models (composing + direct-map) don't match structural conservation's accuracy + conservation — an efficiency + guarantee advantage* (not "impossible for any net"). Remaining rigor: multi-seed (Test 6).
-
-**Test 5 — ✅ done: multi-seed rigor (see the [Test 5](#test-5--multi-seed-rigor-5-seeds) section above).** All four tests re-run across 5 seeds → mean ± std. It corrected the Test 3 single-seed accuracy (100 → 94±5) and shrank the learned-vs-blind gap to ~4 pts, while confirming the robust result: structural conservation stays 100 ± 0 where free-emit models drift (cleanest at Test 4, K=6).
-
-**Test 6 — generality (a second reversible system).** Recommended: Margolus-neighbourhood reversible CA. Same recipe (structural conservation + a learned residual) on a *different* system — validates "the recipe transfers" and the proposal's prediction that different systems need different structures. This is the next experiment.
-
-**Order:** Test 4 (done) → Test 5 multi-seed (done) → Test 6 generality (next) — foundation first, then the second floor. Ties into the `data/reversible_systems/` plan in [`../../proposal.md`](../../proposal.md).
+**Scope.** One reversible system (BBS), toy scale, a single 5-seed batch. Whether the same "structural conservation + learned residual" recipe transfers to *other* reversible systems (Margolus CA, Toda, …) is the natural next question — but that is a **separate** experiment, not part of this one.
 
 ## Reproduce (CPU, a few minutes each)
 
