@@ -24,3 +24,6 @@ Thumbs.db
 **/.obsidian/
 .vscode/
 .idea/
+
+# multiseed run log (transient)
+integrable_reversible/experiments/box_ball_learned_vs_transformer/multiseed.log
