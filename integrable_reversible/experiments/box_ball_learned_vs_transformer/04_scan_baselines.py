@@ -80,6 +80,15 @@ class PlainCarrier(nn.Module):        # custom RNN, FREE-emit output
         c = x.float()
         for _ in range(T_STEPS): c = s.one(c)
         return c
+class GRUCarrier(nn.Module):          # STABLE composing free-emit baseline (torch GRU, causal, learns a single step)
+    def __init__(s, d=96, layers=1):
+        super().__init__(); s.gru = nn.GRU(1, d, layers, batch_first=True); s.head = nn.Linear(d, 1)
+    def one(s, c):
+        h, _ = s.gru(c.unsqueeze(-1)); return torch.sigmoid(s.head(h)).squeeze(-1)
+    def forward(s, x):
+        c = x.float()
+        for _ in range(T_STEPS): c = s.one(c)
+        return c
 class LSTMNet(nn.Module):
     def __init__(s, d=96, layers=2):
         super().__init__(); s.emb = nn.Embedding(2, d); s.lstm = nn.LSTM(d, d, layers, batch_first=True); s.head = nn.Linear(d, 2)
@@ -132,8 +141,8 @@ class TF(nn.Module):
 rng = np.random.default_rng(0); Xtr, Ytr = dataset(TRAIN_L, 3000, rng); B = 256
 ce = nn.CrossEntropyLoss(); bce = nn.BCELoss()
 def prob(m, X):
-    if isinstance(m, PlainCarrier):       return m(X)
-    if isinstance(m, ConservingCarrier):  return m(X, hard=True)
+    if isinstance(m, (PlainCarrier, GRUCarrier)): return m(X)
+    if isinstance(m, ConservingCarrier):          return m(X, hard=True)
     return m(X).softmax(-1)[..., 1]
 def fit(m, epochs, lr, logits):
     opt = torch.optim.AdamW(m.parameters(), lr=lr)
@@ -143,16 +152,17 @@ def fit(m, epochs, lr, logits):
             idx = perm[i:i+B]
             loss = ce(m(Xtr[idx]).reshape(-1, 2), Ytr[idx].reshape(-1)) if logits \
                    else bce(m(Xtr[idx]).clamp(1e-6, 1-1e-6), Ytr[idx].float())
-            opt.zero_grad(); loss.backward(); opt.step()
+            opt.zero_grad(); loss.backward()
+            torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)     # gradient clipping for stability
+            opt.step()
     return m
 models = {}
 for name, ctor, ep, lr, lg in [
-    ("plain carrier (RNN, small)", lambda: PlainCarrier(32, 64),  45, 3e-3, False),
-    ("plain carrier (RNN, big)",   lambda: PlainCarrier(64, 256), 80, 3e-3, False),  # fairness check
-    ("LSTM",                       lambda: LSTMNet(),      45, 2e-3, True),
-    ("SSM (Mamba-family)",         lambda: SSMNet(),       45, 2e-3, True),
-    ("conserving carrier",         lambda: ConservingCarrier(), 45, 3e-3, False),
-    ("Transformer (ref)",          lambda: TF(),           30, 1e-3, True)]:
+    ("GRU carrier (composing)", lambda: GRUCarrier(),  50, 2e-3, False),  # stable composing free-emit baseline
+    ("LSTM",                    lambda: LSTMNet(),      45, 2e-3, True),
+    ("SSM (Mamba-family)",      lambda: SSMNet(),       45, 2e-3, True),
+    ("conserving carrier",      lambda: ConservingCarrier(), 45, 3e-3, False),
+    ("Transformer (ref)",       lambda: TF(),           30, 1e-3, True)]:
     print(f"training {name} ..."); models[name] = fit(ctor(), ep, lr, lg)
 
 # ── evaluate: accuracy + conservation vs length ──────────────────────────────
@@ -173,8 +183,7 @@ with torch.no_grad():
         print(f"{name:22s}{row}")
 
 # ── figure ───────────────────────────────────────────────────────────────────
-style = {"conserving carrier": ("#1e8449","D-",2.2),
-         "plain carrier (RNN, small)": ("#e67e22","o-",1.3), "plain carrier (RNN, big)": ("#d35400","s-",1.7),
+style = {"conserving carrier": ("#1e8449","D-",2.2), "GRU carrier (composing)": ("#e67e22","s-",1.7),
          "LSTM": ("#8e44ad","o-",1.6), "SSM (Mamba-family)": ("#2980b9","o-",1.6), "Transformer (ref)": ("#95a5a6","o--",1.4)}
 fig, ax = plt.subplots(1, 2, figsize=(13, 5))
 for a, key, ttl, ylab, ylim in [(0,"acc","Accuracy vs length","per-position accuracy (%)",(40,102)),
