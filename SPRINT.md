@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-06 05:18 UTC  
+**Generated:** 2026-07-06 06:42 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -25,11 +25,11 @@
 |------|-------|
 | Status | ✅ Good |
 | Active days | 6 / 7 |
-| Total commits | 39 |
+| Total commits | 40 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | **1** | **4** | **10** |
+| ⚪ | **7** | **6** | **11** | **1** | **4** | **11** |
 
 **Tue – Tuesday, Jun 30**
 
@@ -77,6 +77,7 @@
 
 **Sun – Sunday, Jul 5**
 
+- `2fb64b4` box-ball README: 3→5 tests, drop Test 6/Margolus plan, add Conclusion (EN+zh) — _dongzhang84_ `2026-07-05 23:42`
 - `2c49696` docs(Test 5): add multi-seed formal numbers + honest corrections; renumber — _dongzhang84_ `2026-07-05 22:18`
 - `37c06fa` experiments(Test 5): multi-seed (5 seeds) run over Tests 1-4 — artifacts — _dongzhang84_ `2026-07-05 22:14`
 - `74cc1d0` experiments(Test 4): replace unstable RNN with a stable composing GRU; narrow the claim — _dongzhang84_ `2026-07-05 21:49`
