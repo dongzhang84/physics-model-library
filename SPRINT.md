@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-06 03:52 UTC  
+**Generated:** 2026-07-06 04:49 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -25,11 +25,11 @@
 |------|-------|
 | Status | ✅ Good |
 | Active days | 6 / 7 |
-| Total commits | 36 |
+| Total commits | 37 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | **1** | **4** | **7** |
+| ⚪ | **7** | **6** | **11** | **1** | **4** | **8** |
 
 **Tue – Tuesday, Jun 30**
 
@@ -77,6 +77,7 @@
 
 **Sun – Sunday, Jul 5**
 
+- `74cc1d0` experiments(Test 4): replace unstable RNN with a stable composing GRU; narrow the claim — _dongzhang84_ `2026-07-05 21:49`
 - `18ca9f7` experiments: Test 4 — fair comparison vs scan models (RNN/LSTM/Mamba), honest — _dongzhang84_ `2026-07-05 20:52`
 - `1a1162c` docs: write the Test 4-6 plan into the README (no code run) — _dongzhang84_ `2026-07-05 16:49`
 - `a4906e3` docs: reframe the core claim away from 'beat Transformer' — _dongzhang84_ `2026-07-05 15:12`
