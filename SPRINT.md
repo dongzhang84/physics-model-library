@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-06 05:15 UTC  
+**Generated:** 2026-07-06 05:18 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -25,11 +25,11 @@
 |------|-------|
 | Status | ✅ Good |
 | Active days | 6 / 7 |
-| Total commits | 38 |
+| Total commits | 39 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| ⚪ | **7** | **6** | **11** | **1** | **4** | **9** |
+| ⚪ | **7** | **6** | **11** | **1** | **4** | **10** |
 
 **Tue – Tuesday, Jun 30**
 
@@ -77,6 +77,7 @@
 
 **Sun – Sunday, Jul 5**
 
+- `2c49696` docs(Test 5): add multi-seed formal numbers + honest corrections; renumber — _dongzhang84_ `2026-07-05 22:18`
 - `37c06fa` experiments(Test 5): multi-seed (5 seeds) run over Tests 1-4 — artifacts — _dongzhang84_ `2026-07-05 22:14`
 - `74cc1d0` experiments(Test 4): replace unstable RNN with a stable composing GRU; narrow the claim — _dongzhang84_ `2026-07-05 21:49`
 - `18ca9f7` experiments: Test 4 — fair comparison vs scan models (RNN/LSTM/Mamba), honest — _dongzhang84_ `2026-07-05 20:52`
