@@ -15,11 +15,11 @@ pipeline on the Box-Ball System and now extended to a second system (Margolus).
 
 ## [Unreleased]
 
-### In progress — Experiment 2: Margolus block CA (a second reversible system) · 2026-07-06
+### Experiment 2: Margolus block CA (a second reversible system) — 1D done · 2026-07-06
 
-Testing whether the "structural conservation + learned residual" recipe
+Tested whether the "structural conservation + learned residual" recipe
 **transfers** off the Box-Ball System to a structurally different reversible
-system (a block/partitioning CA with no long-range carrier).
+system (a block/partitioning CA with no long-range carrier). It does.
 
 - **Added** `integrable_reversible/experiments/margolus_block_ca/`.
   - `01_margolus_system.py` — the 1D Margolus block CA (block size 3, partition
@@ -28,16 +28,22 @@ system (a block/partitioning CA with no long-range carrier).
     rotation is a non-trivial residual (blind identity = 52.8%).
   - `02_probe.py` — single-seed probe. Because Margolus' one-step rule is local,
     the horizon grows with length (`T = L/2`) to recreate a length-generalization
-    challenge. A fair **bidirectional** free-form GRU learns the single step well
-    (98.6%) but not *exactly*; compounded over `T ∝ L` steps its accuracy falls to
-    ~60% and conservation to ~1%, while the structural block-CA is exact per step
-    and stays **100/100** at every horizon.
-  - `README.md` — design, ground truth, probe result, honest boundary, next steps.
-- **Finding (single seed):** the Box-Ball result transfers, and sharpens the
-  thesis — structural conservation matters most precisely when composing many
-  steps (the reversible-systems regime).
-- **Next:** multi-seed rigor (5 seeds), 1–2 more fair baselines (bi-LSTM, small
-  Transformer), figures, bilingual write-up; later a 2D classic Margolus.
+    challenge (learn one step, compose it many times on a bigger ring).
+  - `03_multiseed.py` — the formal numbers: 5 seeds, three fair free-form
+    baselines (bidirectional GRU / LSTM, small Transformer), each given ample
+    equal budget (120 epochs) so all reach **~99% single-step**. Composed under
+    `T ∝ L` all three collapse (conservation → ~0–1%, accuracy → ~chance by
+    L=384) while the structural block-CA stays **100/100**. Plus error-bar figures
+    and a single-step diagnostic.
+  - `README.md` + `README.zh-CN.md` — bilingual write-up.
+- **Finding (5 seeds):** the Box-Ball result transfers and sharpens — the drift is
+  not GRU-specific (three architectures, ~99% single-step, all drift), and a tiny
+  single-step residual is fatal under long composition; structural conservation
+  matters most precisely when composing many steps. Recorded honestly as **same
+  recipe, different backbone** (block-partition vs carrier scan) — not a different
+  structure, which answers the proposal's per-system-structure question with "no"
+  for Margolus.
+- **Optional next:** 2D classic Margolus (breadth already banked by 1D).
 
 ---
 
