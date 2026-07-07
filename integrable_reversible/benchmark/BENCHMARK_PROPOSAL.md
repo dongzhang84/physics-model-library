@@ -3,6 +3,29 @@
 > Status: proposal draft. This file defines what the benchmark should become. The current
 > `README.md` records an existing benchmark attempt and why it is not valid yet.
 
+---
+
+## ⛔ 前置探针 — 先跑这个,再决定要不要建下面整套（Claude Code 加，2026-07-07）
+
+**这份 proposal 好,但它把整篇论文押在一个从没跑过的系统 `colored BBS`（§7 Tier 2、§11 第 3 主力）上。这是"多孤子 benchmark 信誓旦旦、跑完 leak 审计才发现是硬编"的原样翻版。在建 Phase A–E 之前，必须先用一个 ~1 天的单种子探针验证核心假设，否则可能搭完整套框架才发现主力是空的。**
+
+**要探的不是裸 colored BBS，是 `colored × finite-carrier BBS` 的组合**——因为"深"和"真学"是**正交**的两件事，各由不同机制提供：
+
+- **颜色 / 多 species** → 让守恒量丰富（带标签的孤子内容）→ 治"单一守恒可被 bolt-on 复制"；
+- **finite-carrier（有界容量 K）** → 让 emit 门**非平凡**（carrier-blind ≠ 满分，如 K=6 上 ≈89%）→ 治"硬编 leak"。
+
+裸 colored BBS 仍是一个**固定确定性 CA 规则**，一个写死正确规则的 carrier-blind 很可能照样满分（和 plain BBS 的 `emit=1−cell` 一样硬编）。所以"又深又真学"必须**两者组合**，而这个组合**一次都没验证过**（三重未证：颜色够不够深？有界容量上真学得出带标签内容？free-form 真的会崩？）。
+
+**探针（单种子，~1 天）：** 实现 `colored finite-carrier BBS`（精确 rollout + 带标签孤子内容提取器 + 自检守恒/可逆），跑三方——**结构模型（学）/ carrier-blind（写死规则、不训练）/ free-form + bolt-on**——只问一个问题：
+
+> **关掉学习（carrier-blind），带标签孤子内容的精确率掉不掉？**
+> - **掉（blind ≪ 学习模型）** → 又深（颜色）、又真学（有界容量）、bolt-on 补不上 → **核心假设成立，值得按下面搭。**
+> - **不掉（blind 也高）** → 又一个硬编死结 → **proposal 主力塌，别建，重想。**
+
+通过这个探针之前，下面所有 tier / spec / Phase 都是**基于未验证假设的设计**。**一天探针，省两周框架。**
+
+---
+
 ## 0. One-sentence goal
 
 Build a benchmark that tests whether a **learned** model with integrable / reversible structure can
@@ -317,4 +340,18 @@ The paper's main sentence should be:
 > bolt-on constraints fail at least one of these, usually interaction content.
 
 That is the clean version of the project claim.
+
+---
+
+## 评价（Claude Code，2026-07-07；综合另一份 Claude 评价）
+
+**结论：这是目前最规整、防坑意识最强的一版（§6/§9 把 leak 审计、bolt-on gap 写成硬性通过条件，把踩出来的照妖镜制度化了，这点该认）。但它有三个致命隐患，都是已踩过的坑的翻版；不先解决，很可能"搭完框架发现主力是空的"。**
+
+1. **整篇论文押在一个从没跑过的系统（colored BBS）上。** 它自己把 colored BBS 定为"最重要的新系统"、写进论文第 3 主力（§11），但这个系统一次没跑、carrier-blind 一次没审计。这和多孤子 benchmark 当初"信誓旦旦、跑完 leak 才发现硬编"是同一个位置——未验证却已当主力。
+2. **"深 + 真学"仍靠不同 tier 各证一块、拼起来充数。** finite-carrier = 真学但浅、多孤子 = 深但硬编，**两者兼得的单一系统一个都没有**。proposal 没解决这个核心缺口，只是赌 colored BBS 能填——填不填得上取决于那个没做的探针，所以整个结构悬空。
+3. **防坑机制放错了阶段。** 审计被当成"设计门槛"，却没先用探针实测哪个系统能过门槛。按 Phase A–E 搭完，跑到 Tier 2 才发现 leak 审计没过 → 主力塌、框架大半白费。**顺序要反：先探针，再决定搭不搭。**
+
+**补一刀（第一手经验）：** 裸 colored BBS 很可能就是 plain-BBS 那种硬编 leak——"颜色"让**不变量**丰富（治 bolt-on），但不让**学习**非平凡（那来自 finite-carrier 的有界容量，与颜色正交）。所以真正该探的是 **`colored × finite-carrier` 组合**，且它是三重未验证。见本文件顶部的「前置探针」。
+
+**一句话：这份 proposal 值得认真对待，但在跑那个探针之前，它的核心仍是一张空头支票。**
 
