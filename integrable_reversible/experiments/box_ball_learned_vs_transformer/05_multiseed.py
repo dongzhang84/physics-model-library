@@ -185,6 +185,21 @@ def evaluate(m, lengths, rng, T, kind, K, cfg):
             cons = (pred.sum(1) == Xte.sum(1)).float().mean().item()*100
             out[L] = (acc, cons)
     return out
+def evaluate_pc(m, lengths, rng, T, kind, K, cfg):
+    """same trained model, + BOLTED-ON conservation: project the output to the top-N cells
+    (N = input ball-count, the conserved quantity) so ball-count is forced exact. Litmus:
+    does forcing conservation onto a free-form model rescue its accuracy under composition?"""
+    m.eval(); out = {}
+    with torch.no_grad():
+        for L in lengths:
+            Xte, Yte = data(L, NTEST, rng, T, kind, K, cfg)
+            p = prob(m, Xte); n = Xte.sum(1)
+            ranks = p.argsort(1, descending=True).argsort(1)      # 0 = highest prob
+            pred = (ranks < n.unsqueeze(1)).long()                # exactly n ones per row
+            acc = (pred == Yte).float().mean().item()*100
+            cons = (pred.sum(1) == Xte.sum(1)).float().mean().item()*100
+            out[L] = (acc, cons)
+    return out
 
 # ── the four tests (one seed each) ───────────────────────────────────────────
 LEN123 = [32, 48, 64, 96, 128]; LEN4 = [32, 64, 128, 256]
@@ -214,10 +229,17 @@ def test4(sd):
     seed_all(sd); rng = np.random.default_rng(sd); Xtr, Ytr = data(32, NTRAIN, rng, 2, "fc", 6, cfg_dense)
     r = {}
     r["conserving carrier"]    = evaluate(fit(ConservingCarrier(), Xtr, Ytr, EP(45), 3e-3), LEN4, rng, 2, "fc", 6, cfg_dense)
-    r["GRU carrier (compose)"] = evaluate(fit(GRUCarrier(), Xtr, Ytr, EP(50), 2e-3, clip=True), LEN4, rng, 2, "fc", 6, cfg_dense)
-    r["LSTM"]                  = evaluate(fit(LSTMNet(), Xtr, Ytr, EP(45), 2e-3, clip=True), LEN4, rng, 2, "fc", 6, cfg_dense)
-    r["SSM (Mamba)"]           = evaluate(fit(SSMNet(), Xtr, Ytr, EP(45), 2e-3, clip=True), LEN4, rng, 2, "fc", 6, cfg_dense)
+    gru  = fit(GRUCarrier(), Xtr, Ytr, EP(50), 2e-3, clip=True)
+    lstm = fit(LSTMNet(),    Xtr, Ytr, EP(45), 2e-3, clip=True)
+    ssm  = fit(SSMNet(),     Xtr, Ytr, EP(45), 2e-3, clip=True)
+    r["GRU carrier (compose)"] = evaluate(gru,  LEN4, rng, 2, "fc", 6, cfg_dense)
+    r["LSTM"]                  = evaluate(lstm, LEN4, rng, 2, "fc", 6, cfg_dense)
+    r["SSM (Mamba)"]           = evaluate(ssm,  LEN4, rng, 2, "fc", 6, cfg_dense)
     r["Transformer"]           = evaluate(fit(TF(), Xtr, Ytr, EP(30), 1e-3), LEN4, rng, 2, "fc", 6, cfg_dense)
+    # bolt-on litmus: same trained free-form models, + forced conservation (top-N projection)
+    r["GRU + bolted-on cons"]  = evaluate_pc(gru,  LEN4, rng, 2, "fc", 6, cfg_dense)
+    r["LSTM + bolted-on cons"] = evaluate_pc(lstm, LEN4, rng, 2, "fc", 6, cfg_dense)
+    r["SSM + bolted-on cons"]  = evaluate_pc(ssm,  LEN4, rng, 2, "fc", 6, cfg_dense)
     return r
 
 TESTS = [("Test 1", test1, LEN123), ("Test 2", test2, LEN123), ("Test 3", test3, LEN123), ("Test 4", test4, LEN4)]
@@ -235,7 +257,7 @@ for tname, fn, lengths in TESTS:
     allres[tname] = {"lengths": lengths, "agg": agg}
     # error-bar figure (accuracy + conservation)
     fig, ax = plt.subplots(1, 2, figsize=(12, 4.6))
-    for mo in models:
+    for mo in [m for m in models if "bolted" not in m]:      # bolt-on variants go in a dedicated figure
         am = [agg[mo][L][0] for L in lengths]; asd = [agg[mo][L][1] for L in lengths]
         cm = [agg[mo][L][2] for L in lengths]; csd = [agg[mo][L][3] for L in lengths]
         ax[0].errorbar(lengths, am, yerr=asd, marker="o", capsize=3, label=mo)
@@ -245,4 +267,19 @@ for tname, fn, lengths in TESTS:
     for a in ax: a.set_xlabel("length"); a.grid(alpha=0.3); a.legend(fontsize=7)
     fig.tight_layout(); fig.savefig(f"05_{tname.replace(' ', '').lower()}.png", dpi=120, bbox_inches="tight"); plt.close(fig)
     json.dump(allres, open("multiseed_results.json", "w"), indent=1)   # save incrementally
-print("\nDONE — multiseed_results.json + 05_test*.png")
+
+# dedicated bolt-on figure (Test 4 accuracy): does forcing conservation onto a free-form model rescue accuracy?
+t4 = allres["Test 4"]; L4 = t4["lengths"]; a4 = t4["agg"]
+fig, ax = plt.subplots(figsize=(7, 5))
+ax.errorbar(L4, [a4["conserving carrier"][L][0] for L in L4], yerr=[a4["conserving carrier"][L][1] for L in L4],
+            fmt="D-", color="#1e8449", lw=2.2, capsize=3, label="conserving carrier (conservation intrinsic)")
+for free, pc, col in [("GRU carrier (compose)", "GRU + bolted-on cons", "#e67e22"),
+                      ("LSTM", "LSTM + bolted-on cons", "#8e44ad"), ("SSM (Mamba)", "SSM + bolted-on cons", "#2980b9")]:
+    ax.plot(L4, [a4[free][L][0] for L in L4], "o:", color=col, lw=1.2, alpha=0.6, label=f"{free.split(' ')[0]} — free")
+    ax.errorbar(L4, [a4[pc][L][0] for L in L4], yerr=[a4[pc][L][1] for L in L4], fmt="s-", color=col, lw=1.7, capsize=3,
+                label=f"{free.split(' ')[0]} — + bolted-on conservation")
+ax.set_xlabel("length (32 = trained, rest = OOD)"); ax.set_ylabel("per-position accuracy (%)"); ax.set_ylim(40, 103)
+ax.set_title(f"BBS Test 4 — bolting conservation onto free-form models ({N_SEEDS} seeds)\n(+conservation forces ball-count ~100 for all; accuracy shown)", fontsize=10)
+ax.grid(alpha=0.3); ax.legend(fontsize=7.5); fig.tight_layout()
+fig.savefig("05_bolt_on.png", dpi=120, bbox_inches="tight"); plt.close(fig)
+print("\nDONE — multiseed_results.json + 05_test*.png + 05_bolt_on.png")
