@@ -1,6 +1,6 @@
 # Structural conservation on a second reversible system — the Margolus block CA
 
-**English** · (中文完整版将在实验收尾时补上)
+**English** · [中文](README.zh-CN.md)
 
 > **Status: 1D done.** Ground truth ✅ · single-seed probe ✅ · multi-seed rigor (5 seeds, 3 fair baselines) ✅. Optional next: 2D classic Margolus; Chinese write-up.
 
