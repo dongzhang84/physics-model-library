@@ -1,0 +1,17 @@
+periodic Toda N=8, train t≤5.0, test t≤20.0, moderate amplitude (state var=0.245)
+
+training structural (action-angle) ...
+training free-form ...
+training bolt-on (all N cons pinned) ...
+
+model                             train t≤5      t 5–10     t 10–15     t 15–20   (state MSE; predict-mean ≈ 0.245)
+structural (action-angle)            0.0321      0.4976      0.6299      0.6262
+free-form                            0.0215      0.7389      1.1537      2.0599
+bolt-on (all N cons pinned)          0.2764      0.3841      0.4041      0.5909
+
+model                             train t≤5      t 5–10     t 10–15     t 15–20   (conserved-qty error)
+structural (action-angle)            1.0611      3.6132     15.0765     22.6729
+free-form                            0.6665    217.9767  25911.12505135770.5000
+bolt-on (all N cons pinned)          1.0644      1.1380     13.2554    206.1419
+
+Read: does structural state-MSE stay flat while free-form/bolt-on grow with t?  Does bolt-on keep conserved-qty error low yet still drift in state?
