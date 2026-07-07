@@ -11,14 +11,15 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 1 / 7 |
-| Total commits | 7 |
+| Total commits | 8 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **7** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
+- `0230840` docs(CHANGELOG): Margolus Exp 2 — probe → multi-seed done — _dongzhang84_ `2026-07-06 23:13`
 - `bf471c7` margolus: close out Exp 2 — zh README + sync proposal to multi-seed done — _dongzhang84_ `2026-07-06 23:13`
 - `a68a0e5` margolus: multi-seed rigor (5 seeds, 3 fair baselines) — the discriminator holds — _dongzhang84_ `2026-07-06 23:08`
 - `c66db4d` proposal: sync §1–§4 to latest progress (finite-carrier / multi-seed / probe) — _dongzhang84_ `2026-07-06 21:59`
