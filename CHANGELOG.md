@@ -112,8 +112,11 @@ multi-seed tests asking whether an integrable-style structure can be *learned*
 
 ## Initial commit · 2026-06-24
 
-- **Added** the repository: the thesis ("physics is a systematically mineable
-  library of candidate models for AI"), the English README front door, the
-  `MANIFESTO.md` and `CATALOG.md` (mining map of physics root-families vs. AI
-  capabilities and maturity), and `docs/` + `scripts/` scaffold.
-- **Added** sprint-sync CI wired to the indie-product-playbook.
+- **Added** the repository and its thesis ("physics is a systematically mineable
+  library of candidate models for AI"):
+  - English README front door; `MANIFESTO.md` and `CATALOG.md` (the mining map of
+    physics root-families vs. AI capabilities and maturity).
+  - `docs/物理模型作为下一代AI的方法论基础.md` — the 322-line methodology
+    proposal (goals, research programme, 50-year framing).
+  - `scripts/extract-sprint-summary.py` and sprint-sync CI wired to the
+    indie-product-playbook.
