@@ -1,0 +1,21 @@
+Integrable Extrapolation — flagship (multi-soliton BBS, compose T=12, single seed)
+train: 2–4 solitons, 1 step  |  test: 4–6 solitons, 12 steps (many collisions)
+
+training conserving carrier (structural) ...
+eval (no train)   └ carrier-blind (leak audit) ...
+training GRU (free-form) ...
+training LSTM (free-form) ...
+training Transformer (free-form) ...
+training bolt-on = GRU + count pinned ...
+
+entrant                               acc%  ball-cons%  soliton-exact%  soliton-IoU%
+------------------------------------------------------------------------------------
+conserving carrier (structural)      100.0       100.0           100.0         100.0
+  └ carrier-blind (leak audit)       100.0       100.0           100.0         100.0
+GRU (free-form)                       92.3         0.0             0.0          17.2
+LSTM (free-form)                      93.1         0.0             0.0           1.4
+Transformer (free-form)               87.8         3.3             0.0          33.0
+bolt-on = GRU + count pinned          88.9       100.0             2.5          32.9
+
+Headline: ball-count is conserved by structure AND by the bolt-on; but SOLITON CONTENT
+(the integrable invariant) is preserved only by the structure-aware model.
