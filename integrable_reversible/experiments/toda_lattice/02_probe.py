@@ -86,6 +86,21 @@ class Structural(nn.Module):                            # learnable action-angle
         z = s.enc(s0); I, phi0 = z[:, :s.K], z[:, s.K:]
         phi = phi0 + s.omega(I)*t                       # linear angle motion → extrapolates in t
         return s.dec(torch.cat([I, torch.cos(phi), torch.sin(phi)], -1))
+class StructuralTrue(nn.Module):                       # action-angle with TRUE conserved actions
+    """The actions I = tr(L^k)(s0) are the real conserved quantities (given, not learned —
+    the same quantities the bolt-on baseline gets). The model learns only the initial angles
+    φ0, the frequency map ω(I) (learned ONCE, globally — not estimated per-trajectory from a
+    short window), and the decoder (I, angles)→state. IST's hard inverse map stays learned."""
+    def __init__(s, I_mean, I_std, K=N):
+        super().__init__(); s.K = K
+        s.register_buffer("Im", I_mean); s.register_buffer("Is", I_std)
+        s.enc = mlp(2*N, K); s.omega = mlp(K, K, h=64, n=2); s.dec = mlp(3*K, 2*N)
+    def actions(s, s0):
+        return ((trLk_batch(s0) - s.Im) / s.Is).detach()      # fixed, conserved
+    def forward(s, s0, t):
+        I = s.actions(s0); phi = s.enc(s0) + s.omega(I)*t
+        return s.dec(torch.cat([I, torch.cos(phi), torch.sin(phi)], -1))
+
 class FreeForm(nn.Module):                              # direct map, no structure
     def __init__(s): super().__init__(); s.net = mlp(2*N+1, 2*N)
     def forward(s, s0, t): return s.net(torch.cat([s0, t], -1))
@@ -123,10 +138,12 @@ if __name__ == "__main__":
     S0, T, ST = dataset(300, rng); S0te, Tte, STte = dataset(80, np.random.default_rng(1))
     print(f"periodic Toda N={N}, train t≤{T_TRAIN}, test t≤{T_MAX}, moderate amplitude "
           f"(state var={ST.var().item():.3f})\n")
+    Iall = trLk_batch(S0).detach(); Im = Iall.mean(0); Is = Iall.std(0) + 1e-6   # action stats (conserved)
     models = {
-        "structural (action-angle)": (Structural(), 0.0),
-        "free-form":                 (FreeForm(),    0.0),
-        "bolt-on (all N cons pinned)":(FreeForm(),   1.0),
+        "structural v1 (learn actions)": (Structural(),                  0.0),
+        "structural v2 (true actions)":  (StructuralTrue(Im, Is),        0.0),
+        "free-form":                     (FreeForm(),                     0.0),
+        "bolt-on (all N cons pinned)":   (FreeForm(),                     1.0),
     }
     res = {}
     for name, (m, pen) in models.items():
