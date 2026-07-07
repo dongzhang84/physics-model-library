@@ -2,6 +2,10 @@
 
 **English** · (中文版待补)
 
+> For the proposed next benchmark specification, see
+> [`BENCHMARK_PROPOSAL.md`](BENCHMARK_PROPOSAL.md). This README documents the current attempt and
+> why it is not valid yet.
+
 > **This is NOT a working benchmark yet — do not call it one.** As a demonstration of the paper's
 > real goal ("a genuinely *learned* integrable model wins"), it **fails**: a leak audit shows the
 > structural winner is **hardcoded**, not learned (carrier-blind also scores 100). What *is* real:
