@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-07 19:05 UTC  
+**Generated:** 2026-07-07 21:07 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 19 |
+| Total commits | 20 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **11** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **12** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -30,6 +30,7 @@
 
 **Tue – Tuesday, Jul 7**
 
+- `639ca0f` benchmark: flagship system — multi-soliton BBS ground truth (verified) — _dongzhang84_ `2026-07-07 14:07`
 - `afb2deb` Exp 3 Toda: attempt 2 (Neural-Lax) — F2' + the real finding (continuous task doesn't discriminate) — _dongzhang84_ `2026-07-07 12:05`
 - `c8cdf96` Exp 3 Toda: pre-registration v2 (Neural-Lax) — committed before results — _dongzhang84_ `2026-07-07 11:58`
 - `8957ef7` Exp 3 Toda: write up the negative result (attempt 1, action-angle = F2) — _dongzhang84_ `2026-07-07 11:48`
