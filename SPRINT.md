@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-07 23:19 UTC  
+**Generated:** 2026-07-07 23:28 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 22 |
+| Total commits | 23 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **14** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **15** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -30,6 +30,7 @@
 
 **Tue – Tuesday, Jul 7**
 
+- `dd53e0c` docs: stop calling the leaked benchmark attempt a 'benchmark' — _dongzhang84_ `2026-07-07 16:27`
 - `85e7994` docs: write the recent experiments into the cross-cutting documentation — _dongzhang84_ `2026-07-07 16:19`
 - `2f275d2` benchmark: first discriminating leaderboard + honest leak audit — _dongzhang84_ `2026-07-07 14:50`
 - `639ca0f` benchmark: flagship system — multi-soliton BBS ground truth (verified) — _dongzhang84_ `2026-07-07 14:07`
