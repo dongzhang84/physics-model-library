@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-07 00:04 UTC  
+**Generated:** 2026-07-07 00:06 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,14 +11,15 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 1 / 7 |
-| Total commits | 2 |
+| Total commits | 3 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **2** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **3** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
+- `8c24863` docs(CHANGELOG): name the methodology proposal in the init entry — _dongzhang84_ `2026-07-06 17:06`
 - `7f8209e` docs: add CHANGELOG.md — _dongzhang84_ `2026-07-06 17:04`
 - `1955836` new experiment: Margolus block CA — ground truth + single-seed probe — _dongzhang84_ `2026-07-06 00:44`
 
