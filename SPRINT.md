@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-07 18:28 UTC  
+**Generated:** 2026-07-07 18:45 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 15 |
+| Total commits | 16 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **7** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **8** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -30,6 +30,7 @@
 
 **Tue – Tuesday, Jul 7**
 
+- `b98144d` Exp 3 Step 2: probe v2 (true actions) also fails — F2 confirmed, negative result — _dongzhang84_ `2026-07-07 11:45`
 - `ed1221c` Exp 3 Step 2: probe v1 (naive learnable action-angle) — leaning negative (F2), logged — _dongzhang84_ `2026-07-07 11:28`
 - `9b19c6d` Exp 3 Step 1: Toda lattice + symplectic integrator + integrability self-check — _dongzhang84_ `2026-07-07 11:19`
 - `cd8e690` docs(CHANGELOG): bolt-on controls + exactness reframe + Toda pre-registration — _dongzhang84_ `2026-07-07 10:42`
