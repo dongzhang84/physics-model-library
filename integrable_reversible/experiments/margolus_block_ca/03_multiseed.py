@@ -127,6 +127,18 @@ def compose(m, X, T, hard=True):
     for t in range(T): c = (m.step(c, t % BLK, hard=hard) > 0.5).float()
     return c.long()
 
+def compose_conserving(m, X, T):
+    """free-form rollout with a BOLTED-ON conservation projection: each step keep the N
+    highest-probability cells (N = input ball-count, the conserved quantity) → total count
+    is forced exact every step. Same trained model as compose(), only the emit rule differs —
+    isolates 'what does bolting conservation onto a free-form model actually buy?'."""
+    n = X.sum(1); c = X.float()
+    for t in range(T):
+        prob = m.step(c, t % BLK)
+        ranks = prob.argsort(1, descending=True).argsort(1)   # 0 = highest prob
+        c = (ranks < n.unsqueeze(1)).float()                  # exactly n ones per row
+    return c.long()
+
 def one_seed(seed):
     torch.manual_seed(seed); np.random.seed(seed)
     rng = np.random.default_rng(seed); Xtr, Ytr, Ptr = step_data(4000, rng); B = 256
@@ -146,8 +158,9 @@ def one_seed(seed):
                 opt.zero_grad(); loss.backward()
                 if cf["clip"]: torch.nn.utils.clip_grad_norm_(m.parameters(), 1.0)
                 opt.step()
-        m.eval()
-        rng_te = np.random.default_rng(1000 + seed); rec = {"acc": [], "cons": [], "ss_acc": None, "ss_cons": None}
+        m.eval(); is_ff = not isinstance(m, StructCA)
+        rng_te = np.random.default_rng(1000 + seed)
+        rec = {"acc": [], "cons": [], "acc_pc": [], "cons_pc": [], "ss_acc": None, "ss_cons": None}
         with torch.no_grad():
             # single-step diagnostic: did the model learn ONE (phase-aware) step? (honesty:
             # free-form drift below is from composing this residual, not from failing to learn)
@@ -166,6 +179,10 @@ def one_seed(seed):
                 pred = compose(m, Xte, T)
                 rec["acc"].append((pred == Yte).float().mean().item() * 100)
                 rec["cons"].append((pred.sum(1) == Xte.sum(1)).float().mean().item() * 100)
+                if is_ff:                                   # same model, + bolted-on conservation
+                    pc = compose_conserving(m, Xte, T)
+                    rec["acc_pc"].append((pc == Yte).float().mean().item() * 100)
+                    rec["cons_pc"].append((pc.sum(1) == Xte.sum(1)).float().mean().item() * 100)
         out[name] = rec
         print(f"  seed {seed}  {name:24s}  [1-step {rec['ss_acc']:5.1f}/{rec['ss_cons']:5.1f}]  " +
               "  ".join(f"{a:5.1f}/{c:5.1f}" for a, c in zip(rec["acc"], rec["cons"])))
@@ -182,10 +199,16 @@ for name in MODELS:
     accs = np.array([[ps[name]["acc"] for ps in per_seed]]).reshape(N_SEEDS, len(TEST_L))
     cons = np.array([[ps[name]["cons"] for ps in per_seed]]).reshape(N_SEEDS, len(TEST_L))
     ssa = np.array([ps[name]["ss_acc"] for ps in per_seed]); ssc = np.array([ps[name]["ss_cons"] for ps in per_seed])
-    agg[name] = {"acc_mean": accs.mean(0).tolist(), "acc_std": accs.std(0).tolist(),
-                 "cons_mean": cons.mean(0).tolist(), "cons_std": cons.std(0).tolist(),
-                 "ss_acc_mean": float(ssa.mean()), "ss_acc_std": float(ssa.std()),
-                 "ss_cons_mean": float(ssc.mean()), "ss_cons_std": float(ssc.std())}
+    a = {"acc_mean": accs.mean(0).tolist(), "acc_std": accs.std(0).tolist(),
+         "cons_mean": cons.mean(0).tolist(), "cons_std": cons.std(0).tolist(),
+         "ss_acc_mean": float(ssa.mean()), "ss_acc_std": float(ssa.std()),
+         "ss_cons_mean": float(ssc.mean()), "ss_cons_std": float(ssc.std())}
+    if per_seed[0][name]["acc_pc"]:      # free-form models also have a +conservation variant
+        apc = np.array([[ps[name]["acc_pc"] for ps in per_seed]]).reshape(N_SEEDS, len(TEST_L))
+        cpc = np.array([[ps[name]["cons_pc"] for ps in per_seed]]).reshape(N_SEEDS, len(TEST_L))
+        a.update(acc_pc_mean=apc.mean(0).tolist(), acc_pc_std=apc.std(0).tolist(),
+                 cons_pc_mean=cpc.mean(0).tolist(), cons_pc_std=cpc.std(0).tolist())
+    agg[name] = a
 
 print(f"\n{'model':24s}  " + "   ".join(f"L={L}" for L in TEST_L) + "   (acc% mean±std)")
 for name in MODELS:
@@ -196,6 +219,14 @@ for name in MODELS:
 print(f"\n{'model':24s}  SINGLE-STEP acc / cons (mean±std)  — free-form learns the step well; composing T∝L is what drifts")
 for name in MODELS:
     a = agg[name]; print(f"{name:24s}  {a['ss_acc_mean']:5.1f}±{a['ss_acc_std']:<4.1f} / {a['ss_cons_mean']:5.1f}±{a['ss_cons_std']:<4.1f}")
+
+print(f"\n+CONSERVATION bolted onto the SAME free-form model (top-N emit) — cons is forced ~100; does ACCURACY recover?")
+print(f"{'model':24s}  " + "   ".join(f"L={L}" for L in TEST_L) + "   (acc% mean±std)   [cons L48→L{}]".format(TEST_L[-1]))
+for name in MODELS:
+    a = agg[name]
+    if "acc_pc_mean" not in a: continue
+    accs = "   ".join(f"{m:4.0f}±{s:<3.0f}" for m, s in zip(a["acc_pc_mean"], a["acc_pc_std"]))
+    print(f"{name:24s}  {accs}   [{a['cons_pc_mean'][0]:.0f}→{a['cons_pc_mean'][-1]:.0f}]")
 
 json.dump({"lengths": TEST_L, "n_seeds": N_SEEDS, "agg": agg},
           open("margolus_multiseed_results.json", "w"), indent=1)
@@ -215,3 +246,17 @@ for key, ylab, ylim, fname, ttl in [
     ax.set_xlabel("ring length L  (compose T = L/2 steps)"); ax.set_ylabel(ylab); ax.set_ylim(*ylim)
     ax.set_title(f"Margolus block CA — {ttl} ({N_SEEDS} seeds)", fontsize=11); ax.legend(fontsize=8); ax.grid(alpha=0.3)
     fig.tight_layout(); fig.savefig(fname, dpi=130, bbox_inches="tight"); print(f"saved {fname}")
+
+# bolt-on figure (accuracy): does forcing conservation onto a free-form model rescue accuracy?
+fig, ax = plt.subplots(figsize=(7, 5))
+ax.errorbar(TEST_L, agg["structural block-CA"]["acc_mean"], yerr=agg["structural block-CA"]["acc_std"],
+            fmt="D-", color="#1e8449", lw=2.2, capsize=3, label="structural block-CA (conservation intrinsic)")
+for name, col in [("bi-GRU (free-form)", "#e67e22"), ("bi-LSTM (free-form)", "#8e44ad"), ("Transformer (free-form)", "#2980b9")]:
+    if "acc_pc_mean" not in agg[name]: continue
+    ax.plot(TEST_L, agg[name]["acc_mean"], "o:", color=col, lw=1.2, alpha=0.6, label=f"{name.split(' ')[0]} — free")
+    ax.errorbar(TEST_L, agg[name]["acc_pc_mean"], yerr=agg[name]["acc_pc_std"], fmt="s-", color=col, lw=1.7, capsize=3, label=f"{name.split(' ')[0]} — + bolted-on conservation")
+ax.axvline(TRAIN_L, ls=":", color="gray"); ax.text(TRAIN_L + 2, 44, "train length", fontsize=8, color="gray")
+ax.set_xlabel("ring length L  (compose T = L/2 steps)"); ax.set_ylabel("per-position accuracy (%)"); ax.set_ylim(40, 103)
+ax.set_title(f"Bolting conservation onto a free-form model ({N_SEEDS} seeds)\n(+conservation forces ball-count ~100 for all; accuracy shown)", fontsize=10)
+ax.legend(fontsize=7.5); ax.grid(alpha=0.3); fig.tight_layout()
+fig.savefig("03_bolt_on.png", dpi=130, bbox_inches="tight"); print("saved 03_bolt_on.png")

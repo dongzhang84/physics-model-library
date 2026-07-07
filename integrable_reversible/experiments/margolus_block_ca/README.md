@@ -2,7 +2,7 @@
 
 **English** · [中文](README.zh-CN.md)
 
-> **Status: 1D done.** Ground truth ✅ · single-seed probe ✅ · multi-seed rigor (5 seeds, 3 fair baselines) ✅. Optional next: 2D classic Margolus; Chinese write-up.
+> **Status: 1D done.** Ground truth ✅ · single-seed probe ✅ · multi-seed rigor (5 seeds, 3 fair baselines + a bolted-on-conservation control) ✅. Optional next: 2D classic Margolus.
 
 ## Why this experiment
 
@@ -112,6 +112,43 @@ per-position accuracy (%), mean ± std:
   recipe, different backbone" — **not** a fundamentally different structure. That is
   itself an answer to the proposal's "does each system need a different structure?"
   (here: no).
+
+## But isn't the conservation just built-in? (bolting it onto a free-form model)
+
+A fair objection: the structural model's 100% conservation is a **same-count output mask** —
+built-in, not learned — so it holds for *any* block map. Couldn't you then just **bolt a
+conservation constraint onto an LSTM** and get 100% too? Yes to the first part, so we tested
+the second: the **same trained free-form models**, but composed with a **top-N projection**
+each step (keep the `N` highest-probability cells, `N` = input ball-count) → conservation is
+forced exact. Only the emit rule changes.
+
+accuracy with conservation bolted on (conservation is then **100 by construction**), mean ± std:
+
+| model — free → **+ bolted-on conservation** | L=48 | L=96 | L=192 | L=384 |
+|---|---|---|---|---|
+| bi-GRU | 65 → **72** | 56 → 58 | 54 → 57 | 53 → **56** |
+| bi-LSTM | 64 → **72** | 55 → 59 | 53 → 57 | 53 → **56** |
+| Transformer | 83 → **93** | 50 → 51 | 50 → 51 | 50 → **51** |
+| **structural block-CA (reference)** | 100 | 100 | 100 | **100** |
+
+![bolting conservation onto a free-form model](03_bolt_on.png)
+
+**The honest reframing.**
+- **Conservation *is* bolt-on-able.** The projection forces ball-count to 100% for every
+  free-form model, exactly as a skeptic predicts. So "structural conservation stays at 100" is,
+  by itself, **not** the interesting part.
+- **But bolting it on does not rescue accuracy.** It buys a small bump at short horizon (using
+  the conserved count as a constraint helps a little), yet under `T ∝ L` composition accuracy
+  still collapses to ~51–56% — barely above the free version, and nowhere near the structural
+  model's 100%.
+- **What the structure actually buys is not conservation — it is *exactness*.** A block-map
+  parameterization learns the rule to the last bit and so composes without drift; a bolted-on
+  constraint can't replicate that. Conservation is a **free by-product of getting the rule
+  exactly right**, and the structure is what gets the rule exactly right.
+
+This answers the proposal's own worry ("anyone can add a conservation constraint to an LSTM"):
+on Margolus, yes they can — and it changes almost nothing. The gap is **exactness under
+composition**, not the invariant.
 
 ## Next (optional)
 
