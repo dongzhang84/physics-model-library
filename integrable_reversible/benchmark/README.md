@@ -1,11 +1,13 @@
-# Integrable Extrapolation — a benchmark for integrable structure in sequence models
+# Integrable Extrapolation — a benchmark *attempt* (not yet valid — the current result leaks)
 
 **English** · (中文版待补)
 
-> **Status: partial, single seed, and with an important honest caveat.** The flagship system
-> and one discriminating leaderboard exist. The current structural winner is **hardcoded, not
-> learned** (leak audit below). Not yet done: benchmark spec / multi-seed / a genuine-learning
-> (finite-carrier) entrant. Read the caveat before citing any number.
+> **This is NOT a working benchmark yet — do not call it one.** As a demonstration of the paper's
+> real goal ("a genuinely *learned* integrable model wins"), it **fails**: a leak audit shows the
+> structural winner is **hardcoded**, not learned (carrier-blind also scores 100). What *is* real:
+> generic sequence models and a bolt-on fail to preserve soliton content — necessity of the
+> structure, not learned success. The name "benchmark" is earned only once a genuine-learning
+> (finite-carrier) entrant discriminates without a leak. Single seed; no spec; no multi-seed.
 
 ## What this benchmark is for
 
