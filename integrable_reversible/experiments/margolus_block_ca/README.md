@@ -2,7 +2,7 @@
 
 **English** · (中文完整版将在实验收尾时补上)
 
-> **Status: in progress.** Ground truth ✅ · single-seed probe ✅ (the discriminator appears) · multi-seed rigor + full write-up ⏳.
+> **Status: 1D done.** Ground truth ✅ · single-seed probe ✅ · multi-seed rigor (5 seeds, 3 fair baselines) ✅. Optional next: 2D classic Margolus; Chinese write-up.
 
 ## Why this experiment
 
@@ -46,42 +46,84 @@ with the ring: **at test length `L` we compose `T = L/2` steps.** A composing mo
 extrapolates in `T` for free; the question is whether its *invariant* survives the
 long composition.
 
-## Probe result (single seed — trend signal, not the final number)
+## Result (5 seeds — the formal numbers)
 
-`02_probe.py`: both models learn the **single (phase-aware) step**, then compose
-`T = L/2` on growing rings. Free-form baseline is a **bidirectional** GRU — the fair
-prior here, since a block map needs intra-block context (a causal GRU, natural for
-BBS, is the *wrong* prior for Margolus and was rejected as unfair).
+`03_multiseed.py`: every model learns the **single (phase-aware) step**, then
+composes `T = L/2` on growing rings; run over 5 seeds. The free-form baselines are
+three different architectures — a **bidirectional GRU / LSTM** and a small
+**Transformer** (all fair priors: each sees the whole block; a causal GRU, natural
+for BBS, is the *wrong* prior here and was rejected). Each free-form model was given
+an **ample, equal budget (120 epochs)**, tuned so all reach **~99% single-step** — so
+the drift below cannot be dismissed as under-training.
 
-| | single-step acc / cons | L=48, T=24 | L=96, T=48 | L=192, T=96 | L=384, T=192 |
-|---|---|---|---|---|---|
-| **structural block-CA** | **100 / 100** | **100 / 100** | **100 / 100** | **100 / 100** | **100 / 100** |
-| bidirectional GRU (free-form) | 98.6 / 66.7 | 63 / 7 | 63 / 6 | 62 / 4 | 60 / 1 |
+**They all learn the single step (fair):**
 
-**Reading it.** The fair free-form model learns the step *well* (98.6%) but not
-**exactly**; that ~1.4% residual, compounded over `T ∝ L` steps, drives accuracy to
-~60% and conservation to ~1%. The structural model is exact per step and stays
-100/100 at any horizon. **The Box-Ball finding transfers to a structurally different
-reversible system — and it sharpens the thesis: structural conservation matters most
-precisely when you compose many steps, which is the reversible-systems regime.**
+| model | single-step acc / cons |
+|---|---|
+| **structural block-CA** | **100 ± 0 / 100 ± 0** |
+| bi-GRU | 98.7 ± 0.1 / 60.7 ± 1.9 |
+| bi-LSTM | 98.7 ± 0.1 / 59.7 ± 2.2 |
+| Transformer | 99.7 ± 0.3 / 88.6 ± 9.7 |
 
-**Honest boundary (already visible).** The edge comes from the free-form model not
-hitting *exactly* 100% single-step — not from it "failing to learn the rule" (98.6%
-is high). A model that reached an exact single step would compose cleanly too; but
-hitting *exactly* 100% is the hard part, and the structural model gets it for free.
+**…but composed under `T ∝ L`, only the structural model's invariant survives —**
+ball-count conserved (%), mean ± std:
 
-## Next
+| model | L=48 | L=96 | L=192 | L=384 |
+|---|---|---|---|---|
+| **structural block-CA** | **100 ± 0** | **100 ± 0** | **100 ± 0** | **100 ± 0** |
+| bi-GRU | 9 ± 4 | 3 ± 3 | 2 ± 2 | 1 ± 1 |
+| bi-LSTM | 10 ± 2 | 2 ± 2 | 1 ± 1 | 1 ± 1 |
+| Transformer | 34 ± 14 | 1 ± 2 | 2 ± 3 | 0 ± 1 |
 
-- **Multi-seed rigor** (5 seeds, mean ± std), mirroring Box-Ball Test 5.
-- One or two more **fair** free-form baselines (e.g. bidirectional LSTM; a small
-  Transformer as the single-step learner) to show the drift is not GRU-specific.
-- Figures (accuracy + conservation vs length) and the full bilingual write-up.
-- Later escalation: the **2D classic Margolus** (2×2 blocks, e.g. critters / HPP
-  lattice gas) — richer count classes, the canonical version.
+per-position accuracy (%), mean ± std:
 
-## Reproduce (CPU, ~1 minute each)
+| model | L=48 | L=96 | L=192 | L=384 |
+|---|---|---|---|---|
+| **structural block-CA** | **100 ± 0** | **100 ± 0** | **100 ± 0** | **100 ± 0** |
+| bi-GRU | 65 ± 1 | 56 ± 7 | 54 ± 7 | 53 ± 7 |
+| bi-LSTM | 64 ± 1 | 55 ± 7 | 53 ± 7 | 53 ± 6 |
+| Transformer | 83 ± 9 | 50 ± 2 | 50 ± 1 | 50 ± 1 |
+
+![accuracy vs length](03_accuracy.png)
+![conservation vs length](03_conservation.png)
+
+**Reading it.**
+- **The drift is not GRU-specific.** Three different fair architectures all learn the
+  local step to ~99% and all collapse under long composition — conservation to
+  ~0–1%, accuracy to ~chance — while the structural block-CA stays 100/100.
+- **A tiny single-step residual is fatal under `T ∝ L`.** Even the Transformer's
+  near-perfect 99.7% single step buys only *one* extra length of grace (34% conserved
+  at L=48) before its ball-count is gone by L=96. Structural conservation is exact by
+  construction and immune to horizon.
+- **The Box-Ball finding transfers to a structurally different reversible system, and
+  sharpens the thesis: structural conservation matters most precisely when you compose
+  many steps — the reversible-systems regime.**
+
+**Honest boundaries.**
+- The edge is that a free-form model can't hit *exactly* 100% single-step; the
+  structural model gets exactness for free (a same-count output mask). A model that
+  reached an exact single step would compose cleanly too — but exactness is the hard
+  part, and structure grants it.
+- The structural model's 100% *accuracy* here is easy (the local block map is an
+  8-entry lookup it learns exactly); the real contrast is **conservation under long
+  composition**, not accuracy.
+- Same conservation *recipe* as Box-Ball (mask to the conserved subspace + compose),
+  different *backbone* (block-partition vs carrier scan). So this system wanted "same
+  recipe, different backbone" — **not** a fundamentally different structure. That is
+  itself an answer to the proposal's "does each system need a different structure?"
+  (here: no).
+
+## Next (optional)
+
+- **2D classic Margolus** (2×2 blocks, e.g. critters / HPP lattice gas) — richer count
+  classes, the canonical version. Gated on whether the 1D result needs it; the breadth
+  point is already banked here.
+- Chinese `README.zh-CN.md`.
+
+## Reproduce (CPU)
 
 ```
 python3 01_margolus_system.py   # ground truth: conservation + reversibility + leak audit
-python3 02_probe.py             # single-seed probe: structural stays exact, free-form drifts
+python3 02_probe.py             # single-seed probe (quick)
+python3 03_multiseed.py         # formal 5-seed numbers + figures (MS_QUICK=1 for a fast smoke run)
 ```
