@@ -15,6 +15,48 @@ pipeline on the Box-Ball System and now extended to a second system (Margolus).
 
 ## [Unreleased]
 
+### Exp 3: Toda lattice — pre-registration (no code yet) · 2026-07-07
+
+Locking a falsifiable criterion before writing any code (deep-water discipline).
+
+- **Added** `integrable_reversible/experiments/toda_lattice/PREREGISTRATION.md`.
+- **Criterion** set where it *can't* be bolted on: pin **all N conserved quantities**
+  (the full Lax spectrum) onto a free-form time-stepper and it still can't
+  extrapolate long-time / reproduce the soliton phase shift — because what it lacks
+  is the linear **angle-variable** evolution (action–angle), not the conserved
+  values. Task axis = time extrapolation; structural model = a *learnable*
+  action–angle / spectral model (integrability as inductive bias, **not** a
+  hard-coded IST — avoids the Demo-2 tautology). Includes falsification conditions,
+  anti-cheat guards, ~50–60% rough-demo odds, and an obstacle-log template.
+  **Awaiting sign-off** on three choices before coding.
+
+---
+
+### Reframe: exactness is the crux, conservation is a bolt-on-able by-product · 2026-07-07
+
+A **bolt-on control** — force conservation onto a free-form model (top-N
+projection) and ask whether accuracy recovers — settled the old "anyone can add a
+conservation constraint to an LSTM" objection: yes they can, and it does **not**
+rescue accuracy.
+
+- **Added** the control to **Margolus** (`03_multiseed.py`, `03_bolt_on.png`):
+  conservation forced to 100% for GRU / LSTM / Transformer, yet accuracy still
+  collapses to ~51–56% at L=384 vs the structural model's 100%.
+- **Added** the same control to **Box-Ball** (`05_multiseed.py`, `05_bolt_on.png`):
+  conservation forced to 100%, accuracy essentially unchanged (79–92%) and still
+  below the conserving carrier's 100% — a **modest 9–21 pt gap** here (Test 4
+  composes only T=2, far milder than Margolus's T∝L collapse). Direct confirmation
+  on BBS, not transferred.
+- **Changed** the whole repo's headline accordingly (both experiments' READMEs, EN +
+  zh, and proposal §3/§7): from "structural conservation stays exact where free-form
+  drifts" to "**structural *exactness* composes without drift — even bolting
+  conservation onto the opponent can't catch up**." Conservation is a by-product;
+  exactness is the part that can't be bolted on.
+- **Established** the bolt-on control as a **standard** for every deep-water
+  experiment going forward (proposal §7).
+
+---
+
 ### Experiment 2: Margolus block CA (a second reversible system) — 1D done · 2026-07-06
 
 Tested whether the "structural conservation + learned residual" recipe
