@@ -21,10 +21,21 @@ By contrast: Hamiltonian networks give only approximate energy conservation and 
 
 ## Status
 
-- ✅ **Preliminary experiments (done)** — two minimal demos in [`demos/`](demos/).
-  - `soliton_channel/` — crosstalk-free soliton channel (Bar 1; the paper's motivation / setup).
-  - `box_ball_system/` — Box-Ball System vs Transformer length extrapolation (Bar 2; a preview of the Route A upper bound).
-- 🚧 **Main research (in progress)** — the missing link: a genuinely *trained* network with structural reversibility (Route C). See the structure below.
+**Preliminary demos** (in [`demos/`](demos/)): `soliton_channel/` (Bar 1, motivation) and
+`box_ball_system/` (Bar 2, hard-coded upper-bound preview).
+
+**Experiments** — honest index (each folder has its own write-up):
+
+| experiment | what | outcome |
+|---|---|---|
+| [`experiments/box_ball_learned_vs_transformer/`](experiments/box_ball_learned_vs_transformer/) | 5 tests, multi-seed, finite-carrier BBS | ✅ **positive, genuine learning (no leak).** Structural *exactness* composes without drift where free-emit scan models drift; a bolt-on control shows **conservation is bolt-on-able, exactness is not** (9–21 pt gap it can't close). |
+| [`experiments/margolus_block_ca/`](experiments/margolus_block_ca/) | 2nd reversible system, multi-seed + bolt-on | ✅ **recipe transfers** — "same recipe, different backbone"; free-form (even + bolted conservation) collapses under `T∝L`, structural stays 100/100. |
+| [`experiments/toda_lattice/`](experiments/toda_lattice/) | the *true*-integrable target (Toda) | ❌ **scoped negative result** (2 attempts, both F2). Free-form composing already solves smooth continuous Toda, so no gap for structure — empirically confirms the **discrete→continuous** barrier. Recorded, **not used for the paper.** |
+| [`benchmark/`](benchmark/) | Integrable Extrapolation (multi-soliton BBS) | 🚧 **partial + honest caveat.** Single-seed leaderboard discriminates (soliton content preserved only by structure; conservation bolt-on-able but not soliton content) — **but** a leak audit shows the structural winner is *hardcoded* on plain BBS (carrier-blind also 100%). Needs finite-carrier for genuine learning, spec, multi-seed. |
+
+Bottom line: the **positive, genuinely-learned** result is the box-ball (finite-carrier) + Margolus
+pair (exactness beats free-form, conservation is bolt-on-able); the Toda push is an honest **negative**;
+the multi-soliton benchmark is **not yet a genuine-learning result** (leak).
 
 ## Structure
 
@@ -47,7 +58,8 @@ integrable_reversible/
 │   └── transformer/           baseline: lower bound
 │
 ├── eval/                  ← §3 money plot + four diagnostics (accuracy / conservation drift / reversibility / soliton viz)
-├── experiments/           ← training scripts + configs (wire data × model × eval to reproduce results)
+├── experiments/           ← the actual experiments (box-ball ✅ / Margolus ✅ / Toda ❌ negative) — see index above
+├── benchmark/             ← Integrable Extrapolation (multi-soliton BBS) — 🚧 partial, see index above
 └── paper/                 ← manuscript draft + figures
 ```
 

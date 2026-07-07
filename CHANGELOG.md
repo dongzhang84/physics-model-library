@@ -15,20 +15,51 @@ pipeline on the Box-Ball System and now extended to a second system (Margolus).
 
 ## [Unreleased]
 
-### Exp 3: Toda lattice — pre-registration (no code yet) · 2026-07-07
+### Benchmark: Integrable Extrapolation — flagship system + first leaderboard (single seed) · 2026-07-07
 
-Locking a falsifiable criterion before writing any code (deep-water discipline).
+The paper's intended centrepiece: a benchmark showing integrable structure is the
+method that makes sense. **Partial and with an important honest caveat.**
 
-- **Added** `integrable_reversible/experiments/toda_lattice/PREREGISTRATION.md`.
-- **Criterion** set where it *can't* be bolted on: pin **all N conserved quantities**
-  (the full Lax spectrum) onto a free-form time-stepper and it still can't
-  extrapolate long-time / reproduce the soliton phase shift — because what it lacks
-  is the linear **angle-variable** evolution (action–angle), not the conserved
-  values. Task axis = time extrapolation; structural model = a *learnable*
-  action–angle / spectral model (integrability as inductive bias, **not** a
-  hard-coded IST — avoids the Demo-2 tautology). Includes falsification conditions,
-  anti-cheat guards, ~50–60% rough-demo odds, and an obstacle-log template.
-  **Awaiting sign-off** on three choices before coding.
+- **Added** `integrable_reversible/benchmark/soliton_bbs.py` — flagship system:
+  multi-soliton Box-Ball System. Exact vectorised dynamics (Skorokhod-reflection
+  closed form), `soliton_content` (the conserved multiset of soliton amplitudes —
+  the integrable signature), generator, and a passing self-check (soliton content
+  is an exact invariant; reversible).
+- **Added** `run_benchmark.py` — one single-seed leaderboard. Result *does*
+  discriminate: over 12 composed steps (many collisions), a carrier-structured model
+  preserves soliton content (100/100/100/100) while GRU/LSTM/Transformer collapse
+  (soliton-IoU 1–33%, exact 0%), and the bolt-on (GRU + ball-count pinned) holds
+  ball count at 100% but soliton content at ~2.5% — **conservation is bolt-on-able,
+  soliton content is not.**
+- **⚠️ Honest caveat (leak audit):** on *plain* BBS the structural model = the
+  hardcoded BBS solver (carrier + emit=1−cell), so a carrier-blind entrant also
+  scores 100 — the win is from the **structure, not learning** (the same leak that
+  moved the box-ball experiment to finite-carrier). So this currently shows
+  "integrable structure as an architectural prior is necessary; generic models
+  can't replicate it," **not** "a genuinely *learned* integrable model." Not yet
+  done: benchmark spec / README, multi-seed, and a genuine-learning (finite-carrier)
+  entrant.
+
+### Exp 3: Toda lattice — a scoped negative result (two attempts, both F2) · 2026-07-07
+
+The real target (make a *genuinely* integrable system a learnable model that beats
+every bolted-on constraint). Pre-registered before coding; **the honest outcome is
+negative, and it is recorded, not used for the paper.**
+
+- **Added** `PREREGISTRATION.md` + `PREREGISTRATION_v2_neural_lax.md` (criteria set
+  where they can't be bolted on), `OBSTACLES.md` (every step logged), and a
+  bilingual-pending `README.md` writing up the result.
+- **Step 1** (`01_toda_system.py`): symplectic integrator + Lax matrix; integrability
+  confirmed (energy ~1e-5, momentum ~1e-14, **isospectral ~1e-6**).
+- **Attempt 1 — action-angle** (`02_probe.py`): F2. Learnable action-angle model
+  (actions learned *or* given true) does not extrapolate and does not beat the
+  strongest bolt-on. Blocker = R2 (frequencies + inverse-spectral decoder).
+- **Attempt 2 — Neural-Lax** (`03_neural_lax.py`): F2′ (technical failure) **and** the
+  real finding — a plain free-form composing stepper already *solves* continuous-Toda
+  time extrapolation (MSE ~0.003), so there is no gap for structure. Confirms the
+  roadmap's **discrete→continuous** concern: the discriminator that works on discrete
+  BBS/Margolus does not transfer to a smooth continuous flow.
+- **Stopped** iterating architectures per the pre-registration (no bottomless pit).
 
 ---
 
