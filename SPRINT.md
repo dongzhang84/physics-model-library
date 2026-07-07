@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-07 07:24 UTC  
+**Generated:** 2026-07-07 14:03 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 9 |
+| Total commits | 10 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **1** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **2** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -30,6 +30,7 @@
 
 **Tue – Tuesday, Jul 7**
 
+- `7a06f5c` reframe whole repo: exactness is the crux, conservation is a bolt-on-able by-product — _dongzhang84_ `2026-07-07 07:03`
 - `f306c50` margolus: add a bolted-on-conservation control — answers 'anyone can add conservation' — _dongzhang84_ `2026-07-07 00:24`
 
 ---
