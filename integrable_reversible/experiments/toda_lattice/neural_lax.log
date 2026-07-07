@@ -1,0 +1,18 @@
+periodic Toda N=8, Δ=0.25, compose train t≤5.0→test t≤20.0, isospectral step, hierarchy K=2  (predict-mean MSE≈0.251)
+
+training Neural-Lax (isospectral, learn c_k) ...
+training free-form ...
+training bolt-on (all N cons pinned) ...
+
+model                                 train t≤5     t 5–10    t 10–15    t 15–20   (state MSE)
+Neural-Lax (isospectral, learn c_k)      1.5953     9.5928    28.3872    49.5768
+free-form                                0.0002     0.0008     0.0016     0.0026
+bolt-on (all N cons pinned)              0.2337     0.5292     0.3777     0.3412
+
+model                                 train t≤5     t 5–10    t 10–15    t 15–20   (conserved-qty error)
+Neural-Lax (isospectral, learn c_k)      0.7895     1.0250     1.0238     1.0178
+free-form                                0.0077     0.0158     0.0268     0.0307
+bolt-on (all N cons pinned)              0.2260     0.7483     1.2734     1.3266
+
+learned c_k = [0.393 0.029]   (true Toda ≈ [1, 0])
+Read: does Neural-Lax state-MSE stay flat + conserved-qty ~0, while bolt-on conserves but drifts in state?

@@ -1,13 +1,17 @@
-# Making a *true*-integrable model learnable — the Toda lattice (attempt 1: a negative result)
+# Making a *true*-integrable model learnable — the Toda lattice (two attempts: a negative result + a finding)
 
 **English** · (中文版可后补)
 
-> **Status: honest negative result (F2) on the first structural approach.** Ground-truth
-> integrability ✅ · action-angle learnable model ✅ built · **it does not beat the strongest
-> bolt-on and does not extrapolate — F2.** Pre-registered before coding
-> ([`PREREGISTRATION.md`](PREREGISTRATION.md)); every step logged
-> ([`OBSTACLES.md`](OBSTACLES.md)). Next step is a decision (write up / try a different
-> structure) — see the end.
+> **Status: honest negative result — and a more interesting one than expected.** Ground-truth
+> integrability ✅. Two independent structural approaches tried (pre-registered before coding):
+> **(1) action-angle** → F2 (doesn't extrapolate, doesn't beat bolt-on); **(2) Neural-Lax** →
+> F2′ (technical failure) **and** it surfaced the real finding — **a plain free-form composing
+> stepper already solves continuous-Toda time extrapolation, so there is no gap for integrable
+> structure to fill.** This empirically confirms the roadmap's *discrete→continuous* concern:
+> the discriminator that made structural conservation shine on discrete BBS/Margolus does **not**
+> transfer to smooth continuous Toda. Pre-registrations: [`PREREGISTRATION.md`](PREREGISTRATION.md),
+> [`PREREGISTRATION_v2_neural_lax.md`](PREREGISTRATION_v2_neural_lax.md); every step logged in
+> [`OBSTACLES.md`](OBSTACLES.md).
 
 ## Why this experiment (the real target)
 
@@ -60,7 +64,7 @@ Integrability is an **inductive bias** (conserved actions + linear angles); the 
 map (spectrum + angle → state) is **learned**, not a hard-coded IST — avoiding the Demo-2
 tautology (pre-registration §4).
 
-## Result — F2 (the structure does not win)
+## Attempt 1 result — F2 (action-angle does not win)
 
 State MSE vs prediction time (predict-the-mean baseline ≈ **0.245**), 4 buckets:
 
@@ -98,26 +102,66 @@ inverse-spectral reconstruction. An end-to-end MLP did not capture this, even ha
 actions. (Full diagnosis, ruled-out hypotheses, and the frequency-window argument in
 [`OBSTACLES.md`](OBSTACLES.md) #2–#3.)
 
+## Attempt 2 — Neural-Lax, and the deeper finding
+
+[`03_neural_lax.py`](03_neural_lax.py). A different structure to sidestep attempt 1's R2: keep
+the state as a Lax matrix `L` (Flaschka — trivial both ways), and take an **exactly isospectral
+step** `L → Q L Qᵀ, Q = exp(Δ·B_θ(L))`, learning the Lax-flow generator `B_θ = Σ_k c_k(P₊(L^k)−P₋(L^k))`.
+All three models are now **composing steppers** (learn a small step `Δ=0.25`, compose to `t=20`).
+
+State MSE (predict-mean ≈ **0.251**):
+
+| model | t ≤ 5 | t 5–10 | t 10–15 | t 15–20 |
+|---|---|---|---|---|
+| Neural-Lax (isospectral, learn c_k) | 1.60 | 9.59 | 28.4 | 49.6 |
+| **free-form** | **0.0002** | **0.0008** | **0.0016** | **0.0026** |
+| bolt-on (all N cons pinned) | 0.234 | 0.529 | 0.378 | 0.341 |
+
+**This flipped the picture — and the surprise is the real result:**
+
+- **A plain free-form composing stepper *solves* the task** — MSE ~0.003, essentially flat, and
+  it conserves as a **by-product of accuracy** (conserved-qty error ~0.03, no penalty needed).
+- **Neural-Lax failed technically** (F2′): the reprojection to the tridiagonal band **broke the
+  exact isospectrality** the conjugation was supposed to give (conserved-qty error ~1.0, not 0),
+  and it did not learn `c₁≈1` (`c_k = [0.39, 0.03]`) — so its flow was wrong and it blew up.
+- **The bolt-on penalty back-fired** (worse than plain free-form on *both* axes) — pinning
+  large-dynamic-range `tr(L^k)` destabilised training.
+
+**Why free-form wins here — the finding.** With a small step and a **smooth** flow, the one-step
+map is trivially learnable and composing it barely accumulates error. This is the opposite of the
+**discrete** BBS/Margolus regime, where the exact rule is a discrete map a free-form model can't
+quite nail (98.7% ≠ 100%) and `T ∝ L` composition amplifies the residual into a conservation
+collapse. **On smooth continuous Toda there is no hard-to-nail exact step to compound, so
+free-form composing already extrapolates — leaving no gap for integrable structure to fill.**
+
+This empirically confirms the roadmap's (`../../proposal.md` §7) **discrete → continuous** concern:
+the discriminator that made structural conservation shine on discrete systems does **not** transfer
+to continuous Toda.
+
 ## What this does and does **not** claim
 
-- ✅ **Does** claim: *the action-angle-MLP route, in this rough-demo setup, fails to make
-  Toda's integrable structure learnably useful, and the blocker is R2.* A scoped, honest
-  negative result — exactly the "obstacle analysis" the project values.
-- ❌ **Does not** claim "Toda × integrability is unlearnable." Only one structural family was
-  tried. A reviewer could fairly say we picked a hard architecture.
+- ✅ **Does** claim: *two independent structural routes (action-angle, Neural-Lax) failed to make
+  Toda's integrability learnably win; and — more importantly — a free-form composing stepper already
+  solves continuous-Toda time extrapolation, so this task offers no gap for structure.* The
+  discrete→continuous barrier is real and empirical.
+- ❌ **Does not** claim "no integrable-structure model can ever help on any continuous task." It
+  claims this *time-extrapolation task on smooth Toda* does not discriminate, and two natural
+  structural designs did not win.
 
 ## Next (a decision)
 
-1. **Write it up as the negative result** — clean and honest, and a planned outcome.
-2. **A new pre-registration for a different structure: "Neural-Lax"** — evolve the Lax matrix
-   directly under `dL/dt = [B,L]` (isospectrality by construction), **sidestepping the
-   inverse-spectral decoder** that blocked this attempt. Either it works (the real target
-   delivered) or it also hits F2 (a much stronger *two-independent-routes* negative). A fresh
-   attempt with its own criterion — **not** hyperparameter chasing.
+Two disciplined attempts are spent; per the pre-registration we **stop iterating architectures**
+(no third shot — that would be the bottomless pit we agreed to avoid). The honest deliverable is
+this **negative result + finding**: *integrable structure did not beat free-form on continuous
+Toda, because the discrete-system discriminator (tiny-residual-compounds-under-composition) has no
+analogue in a smooth flow.* Options: write it up as-is; or step back and pick a **different kind of
+continuous task** where free-form composing would *not* already win (e.g. one requiring the global
+scattering structure — long-range, not a smooth local step) — a **new** experiment, not a re-tune.
 
-## Reproduce (CPU, ~2 min)
+## Reproduce (CPU, ~2 min each)
 
 ```
 python3 01_toda_system.py   # integrability self-check (energy / momentum / isospectral)
-python3 02_probe.py         # structural (v1/v2) vs free-form vs strongest bolt-on
+python3 02_probe.py         # attempt 1: action-angle (v1/v2) vs free-form vs bolt-on
+python3 03_neural_lax.py    # attempt 2: Neural-Lax vs free-form vs bolt-on (composing)
 ```
