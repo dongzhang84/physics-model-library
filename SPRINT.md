@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-08 07:12 UTC  
+**Generated:** 2026-07-08 07:32 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ⚠️ Slow |
 | Active days | 3 / 7 |
-| Total commits | 31 |
+| Total commits | 32 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **22** | **1** | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **22** | **2** | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -55,6 +55,7 @@
 
 **Wed – Wednesday, Jul 8**
 
+- `1431e9d` paper: first Chinese draft in the LaTeX template (compiles) — _dongzhang84_ `2026-07-08 00:31`
 - `e965852` docs: polish the Tier 1 wiring (three review nits) — _dongzhang84_ `2026-07-08 00:11`
 
 ---
