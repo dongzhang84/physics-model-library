@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-08 17:25 UTC  
+**Generated:** 2026-07-08 18:56 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ⚠️ Slow |
 | Active days | 3 / 7 |
-| Total commits | 34 |
+| Total commits | 35 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **22** | **4** | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **22** | **5** | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -55,6 +55,7 @@
 
 **Wed – Wednesday, Jul 8**
 
+- `2e9ce84` paper: rewrite the Introduction as flowing prose (no outline headers) — _dongzhang84_ `2026-07-08 11:56`
 - `a2f70ff` paper: write the Introduction — lead with the Physics Model Library vision — _dongzhang84_ `2026-07-08 10:25`
 - `9479c13` paper: rename paper/->latex_cn/ and apply the 6 review fixes (compiles) — _dongzhang84_ `2026-07-08 07:45`
 - `1431e9d` paper: first Chinese draft in the LaTeX template (compiles) — _dongzhang84_ `2026-07-08 00:31`
