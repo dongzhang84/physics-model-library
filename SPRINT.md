@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-08 06:34 UTC  
+**Generated:** 2026-07-08 07:12 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -9,13 +9,13 @@
 
 | Stat | Value |
 |------|-------|
-| Status | ❌ Stalled |
-| Active days | 2 / 7 |
-| Total commits | 30 |
+| Status | ⚠️ Slow |
+| Active days | 3 / 7 |
+| Total commits | 31 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **22** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **22** | **1** | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -52,6 +52,10 @@
 - `12ee035` BBS: add its own bolt-on-conservation control (Test 4, 5 seeds) — direct confirmation — _dongzhang84_ `2026-07-07 07:36`
 - `7a06f5c` reframe whole repo: exactness is the crux, conservation is a bolt-on-able by-product — _dongzhang84_ `2026-07-07 07:03`
 - `f306c50` margolus: add a bolted-on-conservation control — answers 'anyone can add conservation' — _dongzhang84_ `2026-07-07 00:24`
+
+**Wed – Wednesday, Jul 8**
+
+- `e965852` docs: polish the Tier 1 wiring (three review nits) — _dongzhang84_ `2026-07-08 00:11`
 
 ---
 
