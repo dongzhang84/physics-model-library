@@ -1,0 +1,21 @@
+Phase 0 gate (path B) — finite-carrier BBS K=4, compose T=6, metric = amplitude content
+train: 2-4 solitons, 1 step  |  test: 4-6 solitons, 6 steps
+
+train conserving carrier (structural) ...
+eval    carrier-blind (leak audit) ...
+train GRU (free-form) ...
+train LSTM (free-form) ...
+train Transformer (free-form) ...
+train bolt-on = GRU + count pinned ...
+
+entrant                               acc%  count-cons%  amp-exact%  amp-IoU%
+-----------------------------------------------------------------------------
+conserving carrier (structural)      100.0        100.0       100.0     100.0
+  carrier-blind (leak audit)          89.9        100.0        82.5      89.3
+GRU (free-form)                       89.3          0.0         0.0       1.8
+LSTM (free-form)                      89.2          0.0         0.0       0.0
+Transformer (free-form)               78.1          2.5         0.0      27.2
+bolt-on = GRU + count pinned          78.5        100.0         0.0       3.0
+
+GATE PASSES iff: carrier-blind amp-content << structural (genuine), AND
+bolt-on holds count~100 but amp-content stays low (depth).
