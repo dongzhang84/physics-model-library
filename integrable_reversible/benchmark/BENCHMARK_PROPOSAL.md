@@ -3,30 +3,48 @@
 > Status: proposal draft. This file defines what the benchmark should become. The current
 > `README.md` records an existing benchmark attempt and why it is not valid yet.
 
----
+## 0. Phase 0 gate: validate the candidate flagship first
 
-## ⛔ 前置探针 — 先跑这个,再决定要不要建下面整套（Claude Code 加，2026-07-07）
+Before building the full benchmark framework, run a small probe for the most important unverified
+assumption: whether a **colored finite-carrier BBS** task can be both richer than scalar
+conservation and still genuinely learned.
 
-**这份 proposal 好,但它把整篇论文押在一个从没跑过的系统 `colored BBS`（§7 Tier 2、§11 第 3 主力）上。这是"多孤子 benchmark 信誓旦旦、跑完 leak 审计才发现是硬编"的原样翻版。在建 Phase A–E 之前，必须先用一个 ~1 天的单种子探针验证核心假设，否则可能搭完整套框架才发现主力是空的。**
+This matters because "richer invariant content" and "non-trivial learning" come from different
+mechanisms:
 
-**要探的不是裸 colored BBS，是 `colored × finite-carrier BBS` 的组合**——因为"深"和"真学"是**正交**的两件事，各由不同机制提供：
+- **Colored / multi-species BBS** makes the conserved signature richer: labeled soliton content,
+  species counts, and collision identity are harder to recover than total ball count.
+- **Finite-carrier BBS** makes the learned emit rule non-trivial: a carrier-blind fixed rule should
+  no longer reach the learned structural model, as in the plain-BBS leak.
 
-- **颜色 / 多 species** → 让守恒量丰富（带标签的孤子内容）→ 治"单一守恒可被 bolt-on 复制"；
-- **finite-carrier（有界容量 K）** → 让 emit 门**非平凡**（carrier-blind ≠ 满分，如 K=6 上 ≈89%）→ 治"硬编 leak"。
+Plain colored BBS may still be a fixed deterministic CA with a hard-coded carrier solution. The
+first serious probe should therefore be the combination:
 
-裸 colored BBS 仍是一个**固定确定性 CA 规则**，一个写死正确规则的 carrier-blind 很可能照样满分（和 plain BBS 的 `emit=1−cell` 一样硬编）。所以"又深又真学"必须**两者组合**，而这个组合**一次都没验证过**（三重未证：颜色够不够深？有界容量上真学得出带标签内容？free-form 真的会崩？）。
+```text
+colored BBS x finite carrier capacity K
+```
 
-**探针（单种子，~1 天）：** 实现 `colored finite-carrier BBS`（精确 rollout + 带标签孤子内容提取器 + 自检守恒/可逆），跑三方——**结构模型（学）/ carrier-blind（写死规则、不训练）/ free-form + bolt-on**——只问一个问题：
+Minimal probe:
 
-> **关掉学习（carrier-blind），带标签孤子内容的精确率掉不掉？**
-> - **掉（blind ≪ 学习模型）** → 又深（颜色）、又真学（有界容量）、bolt-on 补不上 → **核心假设成立，值得按下面搭。**
-> - **不掉（blind 也高）** → 又一个硬编死结 → **proposal 主力塌，别建，重想。**
+1. Implement exact rollout, invariant checks, a labeled-content extractor, and a reversibility check
+   or inverse verification protocol.
+2. Run three entrants on one seed:
+   - structural model with a learned gate;
+   - carrier-blind / fixed-gate audit with learning disabled;
+   - free-form model plus bolt-on conservation.
+3. Ask one question: does the carrier-blind audit lose labeled-content fidelity relative to the
+   learned structural model?
 
-通过这个探针之前，下面所有 tier / spec / Phase 都是**基于未验证假设的设计**。**一天探针，省两周框架。**
+Interpretation:
 
----
+- If `carrier-blind << learned structural model`, the candidate system has both richer content and
+  genuine learning, so it is worth building the full benchmark around it.
+- If `carrier-blind` is also high, the system has another hard-coding leak; do not promote it to the
+  flagship tier.
 
-## 0. One-sentence goal
+Until this gate passes, colored BBS is a candidate flagship, not an established benchmark system.
+
+## 1. One-sentence goal
 
 Build a benchmark that tests whether a **learned** model with integrable / reversible structure can
 preserve exact long-horizon behavior under length, time, and collision extrapolation, in a way that
@@ -36,7 +54,7 @@ The benchmark should not merely show that a hard-coded rule wins. It should show
 physical structure makes a model learn the rule **more exactly**, so that the learned transition can
 be composed many times without drift.
 
-## 1. Why the current demos are not enough
+## 2. Why the current demos are not enough
 
 The existing experiments already establish useful pieces:
 
@@ -58,7 +76,7 @@ Those are demonstrations, not yet a benchmark. A real benchmark must close four 
 4. **No one-system claim.** The benchmark must contain a family of related systems, not only one
    hand-picked cellular automaton.
 
-## 2. Claim the benchmark should adjudicate
+## 3. Claim the benchmark should adjudicate
 
 The benchmark is designed around this claim:
 
@@ -70,7 +88,7 @@ The phrase "interaction content" is deliberate. The target is not just total mas
 objects, labels, amplitudes, phases, collision outcomes, reversibility, and any system-specific
 conserved signature that distinguishes integrable behavior from ordinary conservation.
 
-## 3. Benchmark name and scope
+## 4. Benchmark name and scope
 
 Working name:
 
@@ -88,7 +106,7 @@ This is honest: the first version lives on discrete systems, where the current e
 discriminator is strongest. Continuous true-integrable systems remain a later tier, not the main
 claim of v1.
 
-## 4. Core protocol
+## 5. Core protocol
 
 Each task instance is a dynamical system family member:
 
@@ -109,7 +127,7 @@ when possible:
 The composed mode is the main discriminator. It is where small errors accumulate, where bolt-on
 constraints fail to recover the true interaction content, and where exact structure should matter.
 
-## 5. Train / test splits
+## 6. Train / test splits
 
 The benchmark should define extrapolation along four axes:
 
@@ -123,7 +141,7 @@ The benchmark should define extrapolation along four axes:
 The key is that testing should require many interactions, not only more empty space. Length
 extrapolation without collision extrapolation is too easy and can reward trivial transport.
 
-## 6. Metrics
+## 7. Metrics
 
 Every leaderboard row should report at least:
 
@@ -154,7 +172,7 @@ accuracy high + interaction content high + conservation high + reversibility hig
 
 A model that preserves ball count but destroys soliton content has not solved the benchmark.
 
-## 7. Systems in v1
+## 8. Systems in v1
 
 ### Tier 1: finite-carrier BBS
 
@@ -177,16 +195,19 @@ Risk:
 
 - still close to the existing BBS structure, so it cannot carry the whole benchmark alone.
 
-### Tier 2: colored / multi-species BBS
+### Tier 2: colored finite-carrier BBS candidate
 
-Purpose: make "soliton identity" and collision content harder than total ball count.
+Purpose: make "soliton identity" and collision content harder than total ball count while preserving
+the no-leak property of finite-carrier BBS.
 
-Why this is likely the most important new system:
+Why this is the candidate flagship:
 
 - total mass is not enough;
 - species counts, soliton amplitudes, and label ordering create a richer invariant signature;
 - collisions must preserve more than a scalar;
 - a bolt-on top-N projection cannot recover the right labeled soliton content.
+- finite carrier capacity should make the learned gate non-trivial, preventing the plain-BBS
+  carrier-blind leak.
 
 Possible task shape:
 
@@ -198,7 +219,8 @@ metrics: per-cell accuracy, per-species count, labeled soliton content, reversib
 ```
 
 This tier is the best bridge between the current toy BBS and a more convincing integrable benchmark.
-It stays discrete and verifiable, but it makes the conserved signature richer.
+It stays discrete and verifiable, but it makes the conserved signature richer. It must pass the
+Phase 0 gate before being treated as a main paper result.
 
 ### Tier 3: Margolus block CA family
 
@@ -234,7 +256,7 @@ Use it as:
 
 It should not block v1.
 
-## 8. Required baselines
+## 9. Required baselines
 
 Each system should include:
 
@@ -249,7 +271,7 @@ Each system should include:
 
 The hard-coded oracle must never be presented as the learned result. It is the ceiling line.
 
-## 9. What counts as success
+## 10. What counts as success
 
 The benchmark succeeds if it produces a table with this qualitative pattern:
 
@@ -269,7 +291,30 @@ The benchmark fails if:
 - a generic model solves all tiers under the same training budget;
 - the task requires so much hard-coded system knowledge that learning becomes cosmetic.
 
-## 10. Implementation plan
+For the colored finite-carrier tier specifically, the benchmark fails if the carrier-blind audit
+matches the learned structural model on labeled-content fidelity.
+
+## 11. Implementation plan
+
+### Phase 0: colored finite-carrier probe
+
+Before building the shared framework, run the single-seed probe described at the top of this file.
+This is a gate, not a full result.
+
+Deliverables:
+
+- exact colored finite-carrier rollout;
+- labeled-content extractor;
+- conservation and reversibility checks;
+- structural learned model;
+- carrier-blind / fixed-gate audit;
+- free-form plus bolt-on conservation baseline;
+- one short table for accuracy, conservation, reversibility, and labeled-content fidelity.
+
+Decision:
+
+- pass: proceed to Phase A and make colored finite-carrier BBS the candidate flagship tier;
+- fail: do not build the v1 benchmark around colored BBS; return to system search.
 
 ### Phase A: spec before models
 
@@ -298,16 +343,17 @@ Add:
 - bolt-on baselines
 - multi-seed runner
 
-### Phase C: colored BBS
+### Phase C: colored finite-carrier BBS
 
-Implement the simplest colored BBS variant that has:
+If Phase 0 passes, implement the simplest colored finite-carrier BBS variant that has:
 
 - exact rollout;
 - content extractor;
 - reversible or at least verified inverse protocol;
-- non-trivial fixed-rule audit below the learned structural model.
+- non-trivial fixed-rule audit below the learned structural model;
+- richer labeled-content metrics than total ball count.
 
-This is the highest-value next system.
+This is the highest-value next system only after the Phase 0 gate passes.
 
 ### Phase D: Margolus family
 
@@ -323,13 +369,13 @@ Produce:
 - plots for accuracy / conservation / content / reversibility versus length and horizon;
 - a leak-audit section that must be filled before a result can be called valid.
 
-## 11. Paper role
+## 12. Paper role
 
 This benchmark should become the experimental spine of the paper:
 
 1. BBS demo: why integrable structure is plausible.
 2. Finite-carrier BBS: learned structure, no plain-rule leak.
-3. Colored BBS: richer interaction content; not just ball count.
+3. Colored finite-carrier BBS, if the gate passes: richer interaction content; not just ball count.
 4. Margolus family: not carrier-specific.
 5. Toda: boundary / negative result explaining why v1 focuses on discrete systems.
 
@@ -339,19 +385,6 @@ The paper's main sentence should be:
 > conservation, reversibility, and interaction content under long composition; generic models and
 > bolt-on constraints fail at least one of these, usually interaction content.
 
-That is the clean version of the project claim.
-
----
-
-## 评价（Claude Code，2026-07-07；综合另一份 Claude 评价）
-
-**结论：这是目前最规整、防坑意识最强的一版（§6/§9 把 leak 审计、bolt-on gap 写成硬性通过条件，把踩出来的照妖镜制度化了，这点该认）。但它有三个致命隐患，都是已踩过的坑的翻版；不先解决，很可能"搭完框架发现主力是空的"。**
-
-1. **整篇论文押在一个从没跑过的系统（colored BBS）上。** 它自己把 colored BBS 定为"最重要的新系统"、写进论文第 3 主力（§11），但这个系统一次没跑、carrier-blind 一次没审计。这和多孤子 benchmark 当初"信誓旦旦、跑完 leak 才发现硬编"是同一个位置——未验证却已当主力。
-2. **"深 + 真学"仍靠不同 tier 各证一块、拼起来充数。** finite-carrier = 真学但浅、多孤子 = 深但硬编，**两者兼得的单一系统一个都没有**。proposal 没解决这个核心缺口，只是赌 colored BBS 能填——填不填得上取决于那个没做的探针，所以整个结构悬空。
-3. **防坑机制放错了阶段。** 审计被当成"设计门槛"，却没先用探针实测哪个系统能过门槛。按 Phase A–E 搭完，跑到 Tier 2 才发现 leak 审计没过 → 主力塌、框架大半白费。**顺序要反：先探针，再决定搭不搭。**
-
-**补一刀（第一手经验）：** 裸 colored BBS 很可能就是 plain-BBS 那种硬编 leak——"颜色"让**不变量**丰富（治 bolt-on），但不让**学习**非平凡（那来自 finite-carrier 的有界容量，与颜色正交）。所以真正该探的是 **`colored × finite-carrier` 组合**，且它是三重未验证。见本文件顶部的「前置探针」。
-
-**一句话：这份 proposal 值得认真对待，但在跑那个探针之前，它的核心仍是一张空头支票。**
-
+That is the clean version of the project claim. If the colored finite-carrier gate fails, the paper
+should keep BBS and Margolus as evidence for the current narrower claim, and treat benchmark design
+as an open system-search problem rather than a completed result.
