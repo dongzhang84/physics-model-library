@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-08 04:15 UTC  
+**Generated:** 2026-07-08 06:34 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 29 |
+| Total commits | 30 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **21** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **22** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -30,6 +30,7 @@
 
 **Tue – Tuesday, Jul 7**
 
+- `e7f76f5` docs: wire the repo to the validated Tier 1 benchmark result — _dongzhang84_ `2026-07-07 23:34`
 - `0aff62a` benchmark Phase 0 (path B): gate PASSES with 5-seed confirmation (K=3) — _dongzhang84_ `2026-07-07 21:14`
 - `94ccc4b` benchmark Phase 0 (path B): K sweep confirms the genuine-learning margin widens at low K — _dongzhang84_ `2026-07-07 19:22`
 - `0f5e53c` benchmark Phase 0: path A colored rule fails reversibility; path B gate passes (single seed) — _dongzhang84_ `2026-07-07 18:00`
