@@ -15,11 +15,11 @@ from collections import Counter
 from fc_bbs import fc_step, fc_run, amplitude_content, make_multisoliton
 torch.manual_seed(0); np.random.seed(0); torch.set_num_threads(4)
 
-K = 4; T_TEST = 6            # small for a fast first signal; scale up once the gate discriminates
+K = 4; AMP_MAX = 7; T_TEST = 6   # K / AMP_MAX are reset per sweep iteration below
 
 def rand_state(rng, n_lo, n_hi, L_min, horizon):
     k = rng.integers(n_lo, n_hi + 1)
-    amps = sorted(rng.integers(1, K + 3, size=k).tolist(), reverse=True)     # amps can exceed K
+    amps = sorted(rng.integers(1, AMP_MAX + 1, size=k).tolist(), reverse=True)   # many amps exceed K
     gaps = rng.integers(3, 6, size=k - 1).tolist()
     pad = (horizon + 1) * int(sum(amps)) + 6
     return make_multisoliton(amps, gaps, right_pad=max(pad, L_min - (sum(amps) + sum(gaps))))
@@ -108,24 +108,22 @@ def evaluate(m, states, T, project=False):
     return dict(acc=100 * acc / n, cons=100 * cons / n, amp_exact=100 * c_exact / n, amp_iou=100 * c_iou / n)
 
 if __name__ == "__main__":
-    rng = np.random.default_rng(0)
-    Xtr, Ytr = onestep_pairs(1200, rng, n_lo=2, n_hi=4, L_min=36, horizon=1)
-    tstates = [rand_state(np.random.default_rng(7 + i), n_lo=3, n_hi=5, L_min=44, horizon=T_TEST) for i in range(40)]
-    print(f"Phase 0 gate (path B) — finite-carrier BBS K={K}, compose T={T_TEST}, metric = amplitude content")
-    print(f"train: 2-4 solitons, 1 step  |  test: 4-6 solitons, {T_TEST} steps\n")
     entrants = [("conserving carrier (structural)", lambda: ConservingCarrier(), False, True),
                 ("  carrier-blind (leak audit)",    lambda: ConservingCarrier(blind=True), False, False),
                 ("GRU (free-form)",                 GRUStep, False, True),
-                ("LSTM (free-form)",                LSTMStep, False, True),
-                ("Transformer (free-form)",         TFStep, False, True),
                 ("bolt-on = GRU + count pinned",    GRUStep, True, True)]
-    rows = []
-    for name, ctor, proj, train in entrants:
-        print(f"{'train' if train else 'eval '} {name} ...")
-        m = fit(ctor(), Xtr, Ytr) if train else ctor()
-        rows.append((name, evaluate(m, tstates, T_TEST, project=proj)))
-    print(f"\n{'entrant':34s}{'acc%':>8}{'count-cons%':>13}{'amp-exact%':>12}{'amp-IoU%':>10}")
-    print("-" * 77)
-    for name, r in rows: print(f"{name:34s}{r['acc']:8.1f}{r['cons']:13.1f}{r['amp_exact']:12.1f}{r['amp_iou']:10.1f}")
-    print("\nGATE PASSES iff: carrier-blind amp-content << structural (genuine), AND")
-    print("bolt-on holds count~100 but amp-content stays low (depth).")
+    for Kval in [2, 3]:
+        K = Kval; AMP_MAX = Kval + 4          # more amps exceed capacity -> carrier-blind should drop more
+        rng = np.random.default_rng(0)
+        Xtr, Ytr = onestep_pairs(1000, rng, n_lo=2, n_hi=4, L_min=36, horizon=1)
+        tstates = [rand_state(np.random.default_rng(7 + i), n_lo=3, n_hi=5, L_min=44, horizon=T_TEST) for i in range(30)]
+        print(f"\n==== K={K}, amps up to {AMP_MAX}, compose T={T_TEST}, single seed ====", flush=True)
+        rows = []
+        for name, ctor, proj, train in entrants:
+            print(f"  {'train' if train else 'eval '} {name} ...", flush=True)
+            m = fit(ctor(), Xtr, Ytr, epochs=25) if train else ctor()
+            rows.append((name, evaluate(m, tstates, T_TEST, project=proj)))
+        print(f"  {'entrant':34s}{'acc%':>8}{'count%':>9}{'amp-exact%':>12}{'amp-IoU%':>10}")
+        for name, r in rows: print(f"  {name:34s}{r['acc']:8.1f}{r['cons']:9.1f}{r['amp_exact']:12.1f}{r['amp_iou']:10.1f}")
+        st = dict(rows)["conserving carrier (structural)"]; bl = dict(rows)["  carrier-blind (leak audit)"]
+        print(f"  >> genuine-learning margin (structural − blind, amp-exact): {st['amp_exact'] - bl['amp_exact']:.1f} pts", flush=True)
