@@ -15,6 +15,25 @@ pipeline on the Box-Ball System and now extended to a second system (Margolus).
 
 ## [Unreleased]
 
+### Benchmark: Integrable Extrapolation — Tier 1 validated (finite-carrier BBS) · 2026-07-07
+
+The paper's first positive, multi-seed-confirmed result: a single discrete integrable system where
+a learned integrable-structured model beats generic models and a bolt-on, genuinely (leak-audited).
+
+- **Added** `benchmark/fc_bbs.py` (finite-carrier BBS + soliton-amplitude content, self-checked:
+  content conserved + reversible for K=2/4/6), `fc_gate_probe.py`, `fc_gate_multiseed.py`, and
+  `RESULT_tier1_finite_carrier.md` (the write-up + explicit boundaries).
+- **Result (K=3, compose T=8, 5 seeds):** structural conserving carrier **100 ± 0** on
+  accuracy / ball-count / amplitude-content; **carrier-blind leak audit 40 ± 3** amplitude-content
+  (a 60-point learned margin — genuine, not the plain-BBS 100% leak); **bolt-on** pins ball count at
+  100% but recovers **0.7 ± 0.8%** amplitude content (conservation is bolt-on-able, the amplitude
+  multiset is not); free-form GRU/LSTM/Transformer keep 0% amplitude content.
+- **Boundaries:** validated **Tier 1** only (one system, K=3) — not the full family; **discrete**
+  integrable only (Toda showed the effect does not transfer to continuous flow).
+- **Superseded:** the earlier plain-BBS multi-soliton attempt (below) leaked; the colored-BBS Phase-0
+  candidate was dropped (naive colored rule not exactly reversible) — colored is deferred to a future
+  Tier 2. Path B (single-color finite-carrier) passed the gate instead.
+
 ### Benchmark: Integrable Extrapolation — flagship system + first leaderboard (single seed) · 2026-07-07
 
 The paper's intended centrepiece: a benchmark showing integrable structure is the

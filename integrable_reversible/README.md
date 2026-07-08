@@ -31,7 +31,7 @@ By contrast: Hamiltonian networks give only approximate energy conservation and 
 | [`experiments/box_ball_learned_vs_transformer/`](experiments/box_ball_learned_vs_transformer/) | 5 tests, multi-seed, finite-carrier BBS | ✅ **positive, genuine learning (no leak).** Structural *exactness* composes without drift where free-emit scan models drift; a bolt-on control shows **conservation is bolt-on-able, exactness is not** (9–21 pt gap it can't close). |
 | [`experiments/margolus_block_ca/`](experiments/margolus_block_ca/) | 2nd reversible system, multi-seed + bolt-on | ✅ **recipe transfers** — "same recipe, different backbone"; free-form (even + bolted conservation) collapses under `T∝L`, structural stays 100/100. |
 | [`experiments/toda_lattice/`](experiments/toda_lattice/) | the *true*-integrable target (Toda) | ❌ **scoped negative result** (2 attempts, both F2). Free-form composing already solves smooth continuous Toda, so no gap for structure — empirically confirms the **discrete→continuous** barrier. Recorded, **not used for the paper.** |
-| [`benchmark/`](benchmark/) | Integrable Extrapolation *attempt* (multi-soliton BBS) + [next benchmark proposal](benchmark/BENCHMARK_PROPOSAL.md) | ❌ **not a valid benchmark yet — the winner leaks.** The single-seed leaderboard shows generic models + bolt-on fail to preserve soliton content (real), **but** the structural winner is *hardcoded* on plain BBS (carrier-blind also 100%) — so it does **not** yet show learned integrable success. Earns the name only with a finite-carrier (no-leak) entrant + spec + multi-seed. The proposal defines the family-level benchmark that should replace this attempt. |
+| [`benchmark/`](benchmark/) | Integrable Extrapolation — **Tier 1 validated** ([`RESULT_tier1_finite_carrier.md`](benchmark/RESULT_tier1_finite_carrier.md)); [family proposal](benchmark/BENCHMARK_PROPOSAL.md) | 🟡 **Tier 1 validated (finite-carrier BBS + soliton-amplitude content, K=3, 5 seeds).** Structural 100±0 / carrier-blind 40±3 (60-pt learned margin, no leak) / bolt-on pins count 100% but recovers 0.7% content — **deep + genuinely learned + no leak** on a discrete integrable system. The full multi-system family is **not** built; discrete only (Toda showed continuous fails). An earlier plain-BBS multi-soliton attempt leaked and is superseded. |
 
 Bottom line: the **positive, genuinely-learned** result is the box-ball (finite-carrier) + Margolus
 pair (exactness beats free-form, conservation is bolt-on-able); the Toda push is an honest **negative**;
@@ -59,7 +59,7 @@ integrable_reversible/
 │
 ├── eval/                  ← §3 money plot + four diagnostics (accuracy / conservation drift / reversibility / soliton viz)
 ├── experiments/           ← the actual experiments (box-ball ✅ / Margolus ✅ / Toda ❌ negative) — see index above
-├── benchmark/             ← Integrable Extrapolation (multi-soliton BBS) — 🚧 partial, see index above
+├── benchmark/             ← Integrable Extrapolation — Tier 1 validated (finite-carrier BBS), family in progress — see index above
 └── paper/                 ← manuscript draft + figures
 ```
 

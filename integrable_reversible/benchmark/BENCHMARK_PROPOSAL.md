@@ -5,6 +5,17 @@
 
 ## 0. Phase 0 gate: validate the candidate flagship first
 
+> **Outcome (2026-07-07): gate PASSED via Path B — single-color finite-carrier BBS + soliton-amplitude
+> content.** Rather than the harder colored rule, the cheaper single-color combination already clears
+> both conditions (5 seeds): structural 100 ± 0 amplitude-content, carrier-blind leak audit only
+> 40 ± 3 (a 60-point learned margin — genuine, no leak), and a ball-count bolt-on recovers 0.7 ± 0.8 %
+> amplitude content (depth: the multiset is not bolt-on-able). This is the **validated Tier 1**
+> ([`RESULT_tier1_finite_carrier.md`](RESULT_tier1_finite_carrier.md)). The **colored** rule was
+> tried first (`colored_bbs.py`) but a naive colored carrier is not exactly reversible (~86%), so a
+> correct colored system needs the crystal / combinatorial-R construction; **colored is deferred to a
+> future Tier 2 enhancement**, not needed for a valid first tier. The original gate reasoning is kept
+> below for the record.
+
 Before building the full benchmark framework, run a small probe for the most important unverified
 assumption: whether a **colored finite-carrier BBS** task can be both richer than scalar
 conservation and still genuinely learned.

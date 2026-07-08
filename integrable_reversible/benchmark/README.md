@@ -1,19 +1,40 @@
-# Integrable Extrapolation — a benchmark *attempt* (not yet valid — the current result leaks)
+# Integrable Extrapolation benchmark — Tier 1 validated; full family in progress
 
 **English** · (中文版待补)
 
-> For the proposed next benchmark specification, see
-> [`BENCHMARK_PROPOSAL.md`](BENCHMARK_PROPOSAL.md). This README documents the current attempt and
-> why it is not valid yet.
+> **Status.** Tier 1 (finite-carrier BBS + soliton-amplitude content) is a **validated** benchmark
+> tier: 5-seed confirmation that a learned integrable-structured model preserves an invariant that
+> generic sequence models and a conservation bolt-on cannot, and the advantage is genuine
+> (leak-audited), on a **discrete** integrable system. Full write-up:
+> **[`RESULT_tier1_finite_carrier.md`](RESULT_tier1_finite_carrier.md)**.
+> The full multi-system benchmark (`BENCHMARK_PROPOSAL.md`) is **not** built. An earlier attempt on
+> plain-BBS multi-soliton is kept below as history — it leaked.
 
-> **This is NOT a working benchmark yet — do not call it one.** As a demonstration of the paper's
-> real goal ("a genuinely *learned* integrable model wins"), it **fails**: a leak audit shows the
-> structural winner is **hardcoded**, not learned (carrier-blind also scores 100). What *is* real:
-> generic sequence models and a bolt-on fail to preserve soliton content — necessity of the
-> structure, not learned success. The name "benchmark" is earned only once a genuine-learning
-> (finite-carrier) entrant discriminates without a leak. Single seed; no spec; no multi-seed.
+## Tier 1 (validated) — finite-carrier BBS + soliton-amplitude content
 
-## What this benchmark is for
+Full write-up and boundaries: [`RESULT_tier1_finite_carrier.md`](RESULT_tier1_finite_carrier.md).
+Headline (K=3, compose T=8, 5 seeds, mean ± std):
+
+- structural conserving carrier: **100 ± 0** on accuracy / ball-count / amplitude-content;
+- carrier-blind **leak audit**: only **40 ± 3** amplitude-content — a 60-point learned margin, so
+  the advantage is genuine (not the plain-BBS leak);
+- **bolt-on** (ball-count pinned): 100 % ball count but **0.7 ± 0.8 %** amplitude content —
+  conservation is bolt-on-able, the amplitude multiset is not;
+- free-form GRU / LSTM / Transformer: 0 % amplitude content.
+
+Reproduce: `python3 fc_bbs.py`, `python3 fc_gate_multiseed.py`. Scope: one discrete integrable
+system, K=3 — not the full family; discrete only (Toda showed the effect does not transfer to
+continuous flow).
+
+---
+
+## Earlier attempt (superseded, kept as history) — plain-BBS multi-soliton, which leaked
+
+> **This earlier attempt is NOT a valid benchmark**; it is retained only as the record of why the
+> flagship moved to finite-carrier. On *plain* BBS the structural winner is hard-coded (its leak
+> audit scores 100 too), so it does not show learned success. Tier 1 above supersedes it.
+
+### What this attempt was for
 
 The paper's thesis is that **integrability is a method that makes sense** — on the right task, a
 model that builds in the integrable structure beats generic sequence models, and the advantage is
