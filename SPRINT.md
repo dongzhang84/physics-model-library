@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-07 23:57 UTC  
+**Generated:** 2026-07-08 00:04 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 25 |
+| Total commits | 26 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **17** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **18** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -30,6 +30,7 @@
 
 **Tue – Tuesday, Jul 7**
 
+- `17b926a` benchmark: adopt GPT's revision of the proposal (Phase 0 gate, integrated + sober) — _dongzhang84_ `2026-07-07 17:04`
 - `4059458` benchmark: add a gating probe + honest evaluation to the (ChatGPT) proposal — _dongzhang84_ `2026-07-07 16:57`
 - `80b78d8` Add integrable benchmark proposal — _dongzhang84_ `2026-07-07 16:43`
 - `dd53e0c` docs: stop calling the leaked benchmark attempt a 'benchmark' — _dongzhang84_ `2026-07-07 16:27`
