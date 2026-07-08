@@ -13,8 +13,9 @@
 > ([`RESULT_tier1_finite_carrier.md`](RESULT_tier1_finite_carrier.md)). The **colored** rule was
 > tried first (`colored_bbs.py`) but a naive colored carrier is not exactly reversible (~86%), so a
 > correct colored system needs the crystal / combinatorial-R construction; **colored is deferred to a
-> future Tier 2 enhancement**, not needed for a valid first tier. The original gate reasoning is kept
-> below for the record.
+> future Tier 2 enhancement**, not needed for a valid first tier.
+
+### Original Phase 0 reasoning (historical — the probe was run; see the outcome above)
 
 Before building the full benchmark framework, run a small probe for the most important unverified
 assumption: whether a **colored finite-carrier BBS** task can be both richer than scalar

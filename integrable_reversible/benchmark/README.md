@@ -46,7 +46,7 @@ discriminator only exists on **discrete** integrable systems, where the exact ru
 and errors compound under composition — on a smooth continuous flow a free-form model just solves
 it. So the benchmark lives on discrete systems.
 
-## Flagship system: the multi-soliton Box-Ball System (`soliton_bbs.py`)
+### Earlier attempted system: the multi-soliton Box-Ball System (`soliton_bbs.py`)
 
 A block of `k` consecutive 1s is a **soliton of amplitude `k`**; it moves right at speed `k`, larger
 solitons overtake and pass through smaller ones, each keeping its amplitude. The **multiset of
@@ -55,14 +55,14 @@ solitons: the integrable signature, not one conservation law). `soliton_bbs.py` 
 (vectorised) dynamics, `soliton_content` (extract the invariant), a generator, and a **passing
 self-check** (content conserved incl. the textbook {3,1} overtake; reversible).
 
-## Task and metric
+### Task and metric (this attempt)
 
 Learn **one** BBS step, then **compose** it over a long horizon on multi-soliton states (many
 collisions); train on few solitons / short, test on more solitons / long. The discriminating metric
 is **soliton-content fidelity**: does the predicted state carry the right multiset of soliton
 amplitudes, not just the right ball count?
 
-## Current result (`run_benchmark.py`, single seed, compose T=12)
+### This attempt's result (`run_benchmark.py`, single seed, compose T=12) — leaked
 
 | entrant | acc % | ball-cons % | soliton-exact % | soliton-IoU % |
 |---|---|---|---|---|
@@ -78,7 +78,7 @@ soliton content** over many collisions, and — the money row — the **bolt-on 
 but soliton content at ~2.5%**. So on this task **conservation (ball count) is bolt-on-able, but the
 soliton content (integrability) is not**; only the carrier-structured model keeps it.
 
-## ⚠️ Honest caveat — the structural winner is hardcoded, not learned
+### Why it leaked — the structural winner is hardcoded, not learned
 
 The `carrier-blind` row is a **leak audit**: it replaces the learnable emit gate with a fixed
 `emit = 1 − cell` (no training). It **also scores 100/100/100/100.** So on *plain* BBS the structural
@@ -91,18 +91,16 @@ So this leaderboard currently supports **"integrable structure as an architectur
 necessary and generic models can't replicate it"** — it does **not** yet support "a genuinely
 *learned* integrable model wins." Those are different claims; only the weaker one is demonstrated here.
 
-## What is done / not done
+### What this attempt did / did not give
 
-- ✅ Flagship system + verified conserved invariant (`soliton_bbs.py`).
+- ✅ The attempt's system + verified conserved invariant (`soliton_bbs.py`).
 - ✅ Metrics + one single-seed leaderboard (`run_benchmark.py`), with a leak audit.
-- ❌ Benchmark spec (formal splits/format), multi-seed, unified README across systems.
-- ❌ A **genuine-learning** entrant with no leak — needs **finite-carrier BBS**, where the emit gate
-  is non-trivial (carrier-blind ≈ 89%, learning matters), already shown to discriminate in the
-  box-ball experiment (Test 4/5).
+- ❌ A **genuine-learning** entrant with no leak — this attempt did not have one; that is what the
+  finite-carrier **Tier 1** above provides (carrier-blind 40 % ≠ structural 100 %, no leak).
 
-## Reproduce (CPU)
+### Reproduce (this attempt)
 
 ```
 python3 soliton_bbs.py     # system self-check: soliton content conserved + reversible
-python3 run_benchmark.py   # single-seed leaderboard + leak audit
+python3 run_benchmark.py   # single-seed leaderboard + leak audit (leaked — see above)
 ```

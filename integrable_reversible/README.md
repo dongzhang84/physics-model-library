@@ -33,9 +33,11 @@ By contrast: Hamiltonian networks give only approximate energy conservation and 
 | [`experiments/toda_lattice/`](experiments/toda_lattice/) | the *true*-integrable target (Toda) | ❌ **scoped negative result** (2 attempts, both F2). Free-form composing already solves smooth continuous Toda, so no gap for structure — empirically confirms the **discrete→continuous** barrier. Recorded, **not used for the paper.** |
 | [`benchmark/`](benchmark/) | Integrable Extrapolation — **Tier 1 validated** ([`RESULT_tier1_finite_carrier.md`](benchmark/RESULT_tier1_finite_carrier.md)); [family proposal](benchmark/BENCHMARK_PROPOSAL.md) | 🟡 **Tier 1 validated (finite-carrier BBS + soliton-amplitude content, K=3, 5 seeds).** Structural 100±0 / carrier-blind 40±3 (60-pt learned margin, no leak) / bolt-on pins count 100% but recovers 0.7% content — **deep + genuinely learned + no leak** on a discrete integrable system. The full multi-system family is **not** built; discrete only (Toda showed continuous fails). An earlier plain-BBS multi-soliton attempt leaked and is superseded. |
 
-Bottom line: the **positive, genuinely-learned** result is the box-ball (finite-carrier) + Margolus
-pair (exactness beats free-form, conservation is bolt-on-able); the Toda push is an honest **negative**;
-the multi-soliton benchmark is **not yet a genuine-learning result** (leak).
+Bottom line: the **positive, genuinely-learned** results are the box-ball (finite-carrier) + Margolus
+pair (exactness beats free-form, conservation is bolt-on-able) and the **validated benchmark Tier 1**
+(finite-carrier BBS + soliton-amplitude content: deep + genuinely learned + no leak, 5 seeds); the
+full benchmark family is **not** built. The Toda push is an honest **negative**. The earlier plain-BBS
+multi-soliton benchmark attempt leaked and is **superseded** by Tier 1.
 
 ## Structure
 
