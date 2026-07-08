@@ -1,6 +1,6 @@
 # Sprint Report
 
-**Generated:** 2026-07-08 01:01 UTC  
+**Generated:** 2026-07-08 02:22 UTC  
 **Showing:** last 3 week(s) of 3 total  
 
 ---
@@ -11,11 +11,11 @@
 |------|-------|
 | Status | ❌ Stalled |
 | Active days | 2 / 7 |
-| Total commits | 27 |
+| Total commits | 28 |
 
 | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
 |---|---|---|---|---|---|---|
-| **8** | **19** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
+| **8** | **20** | ⚪ | ⚪ | ⚪ | ⚪ | ⚪ |
 
 **Mon – Monday, Jul 6**
 
@@ -30,6 +30,7 @@
 
 **Tue – Tuesday, Jul 7**
 
+- `94ccc4b` benchmark Phase 0 (path B): K sweep confirms the genuine-learning margin widens at low K — _dongzhang84_ `2026-07-07 19:22`
 - `0f5e53c` benchmark Phase 0: path A colored rule fails reversibility; path B gate passes (single seed) — _dongzhang84_ `2026-07-07 18:00`
 - `17b926a` benchmark: adopt GPT's revision of the proposal (Phase 0 gate, integrated + sober) — _dongzhang84_ `2026-07-07 17:04`
 - `4059458` benchmark: add a gating probe + honest evaluation to the (ChatGPT) proposal — _dongzhang84_ `2026-07-07 16:57`
