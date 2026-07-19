@@ -1,11 +1,29 @@
 # Sprint Report
 
-**Generated:** 2026-07-08 18:56 UTC  
-**Showing:** last 3 week(s) of 3 total  
+**Generated:** 2026-07-19 06:32 UTC  
+**Showing:** last 4 week(s) of 4 total  
 
 ---
 
-## Week 3 _(current)_ · 2026-07-06 to 2026-07-12
+## Week 4 _(current)_ · 2026-07-13 to 2026-07-19
+
+| Stat | Value |
+|------|-------|
+| Status | ❌ Stalled |
+| Active days | 1 / 7 |
+| Total commits | 1 |
+
+| Mon | Tue | Wed | Thu | Fri | Sat | Sun |
+|---|---|---|---|---|---|---|
+| ⚪ | ⚪ | ⚪ | ⚪ | ⚪ | **1** | ⚪ |
+
+**Sat – Saturday, Jul 18**
+
+- `9bb7432` paper: intro rewrite + Appendix A mining map; add English (latex_en) translation — _dongzhang84_ `2026-07-18 23:32`
+
+---
+
+## Week 3 · 2026-07-06 to 2026-07-12
 
 | Stat | Value |
 |------|-------|
