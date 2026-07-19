@@ -1,0 +1,577 @@
+% !TEX TS-program = xelatex
+% !TEX encoding = UTF-8 Unicode
+% !BIB TS-program = bibtex
+
+% Integrable structure as a learnable inductive bias -- English version (draft).
+% Build: ./build.sh  or  latexmk -xelatex main.tex
+% Parallel translation of ../latex_cn/main.tex.
+
+\documentclass[11pt]{article}
+
+% --- math / fonts --------------------------------------------------------
+\usepackage{amsmath, amssymb, amsfonts, amsthm}
+\usepackage{mathrsfs}
+
+% --- citations / bibliography --------------------------------------------
+\usepackage[numbers]{natbib}
+
+% --- tables / figures ----------------------------------------------------
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+
+% --- layout --------------------------------------------------------------
+\usepackage[margin=0.9in]{geometry}
+\usepackage{verbatim}
+
+% --- hyperlinks (load last) ----------------------------------------------
+\usepackage[colorlinks=true, citecolor=blue, linkcolor=blue, urlcolor=blue,
+            hypertexnames=false]{hyperref}
+
+% --- theorem environments ------------------------------------------------
+\newtheorem{Theorem}{Theorem}[section]
+\newtheorem{Definition}[Theorem]{Definition}
+\newtheorem{Proposition}[Theorem]{Proposition}
+\newtheorem{Lemma}[Theorem]{Lemma}
+\newtheorem{Remark}[Theorem]{Remark}
+% Empirical results (numerical findings, not mathematical theorems) use an
+% upright style, so that experiments are not dressed up as theorems.
+\theoremstyle{definition}
+\newtheorem{Result}{Result}
+\theoremstyle{plain}
+
+% --- metadata ------------------------------------------------------------
+% TODO (final): title still open. Current working title.
+\title{Integrable Structure as a Learnable Inductive Bias:\\
+       An End-to-End Case Study for a Physics Model Library}
+\author{Dong Zhang\thanks{Email: dongzhanghz@gmail.com}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% --- custom macros -------------------------------------------------------
+\newcommand{\amp}{\mathrm{amp}}
+
+% ============ writing guardrails (read before editing; delete before final) ====
+%  Guardrail 1 (boundary / related work, or it gets rejected in one line):
+%    - "recurrent / state-tracking models extrapolate in length, attention does not"
+%      is an established result (Liu 2023; Merrill 2023/2024). We do NOT sell
+%      "beating Transformers".
+%    - Physics inductive biases have precedent (HNN Greydanus 2019; LNN Cranmer 2020;
+%      invertible nets NICE/RealNVP). State the delta: those mostly treat physics as a
+%      target or as a guarantee; we measure whether integrable structure lets a network
+%      *learn* interaction content that neither a generic model nor a bolt-on can, and
+%      keep it honest with the leak / bolt-on audits.
+%    - The Box-Ball System is an established object in mathematical physics
+%      (Takahashi-Satsuma 1990); no one has used it as a learnable sequence model.
+%  Guardrail 2 (scope, do not cross):
+%    - Claim only the "discrete integrable" case. Toda (continuous) is an honest
+%      negative, written up in the boundary section, used to draw the line.
+%    - The point is exactness / interaction content, not conservation -- conservation
+%      is bolt-on-able (shown by the bolt-on control).
+%    - Do not say "a full benchmark is built": this is a validated Tier 1 (one system, K=3).
+%  Guardrail 3 (honest labels): hard numerical (multi-seed) / illustrative / outlook.
+%    The two audits (leak, bolt-on) are the honesty method; every main table carries them.
+% ==================================================================
+
+\begin{abstract}
+\noindent
+% TODO: compress once more before final. Current version states scope honestly.
+Neural network architectures are usually found by empirical search: a design survives
+local modification, cross-task transfer, and benchmark trial and error, rather than
+being selected from a systematic library of candidate structures. This paper treats
+physics as one such library of candidate models and works through a single entry,
+integrable systems, from end to end. We start from a physical structure, turn it into
+a trainable network, design a task that tests its structural advantage, and use control
+audits to rule out hard-coding and bolt-on shortcuts. Concretely, we report a positive
+result on a \textbf{discrete} integrable system. On a \emph{finite-carrier Box-Ball
+System}, a model built around the integrable carrier structure (a conservation-respecting
+carrier sweep with a learnable emit gate) learns to preserve the \textbf{soliton-amplitude
+content} exactly across long compositions of many collisions, an invariant richer than
+the ball count. \emph{Under the models, training budget, and evaluation protocol we test},
+generic sequence models (GRU, LSTM, Transformer) do not, and bolting the conserved
+quantity onto a generic model does not either. Two audits keep the claim honest. A
+\textbf{leak audit} (replacing the learnable gate with a fixed rule) shows the advantage is
+\emph{learned}, not hard-coded: the fixed rule reaches only $40\%$ amplitude content, the
+learned gate $100\%$. A \textbf{bolt-on control} shows the advantage \emph{cannot} be
+bolted on: pinning the ball count to $100\%$ recovers only $0.7\%$ amplitude content, so
+conservation transfers while the interaction content does not. All results hold across
+$5$ random seeds. We also mark the boundary: the effect does not carry over to a smooth
+continuous system (the Toda lattice is a negative result), so we claim only the discrete
+integrable case. We do not present the Box-Ball System as a general architecture; the
+contribution is a demonstration that the ``physics model library'' route can produce a
+measurable, cheat-resistant machine-learning result.
+\end{abstract}
+
+% \tableofcontents
+
+% ========================================================================
+\section{Introduction}\label{sec:intro}
+% ========================================================================
+
+The evolution of deep learning models looks more like accumulated empirical engineering
+than a selection process driven by first principles. This does not mean the existing
+architectures were built without rational motivation. In vision, the local connectivity
+and weight sharing of CNNs have a clear motivation~\citep{lecun1998gradient}, yet the
+breakout of AlexNet depended on ImageNet, GPUs, and specific engineering
+tricks~\citep{krizhevsky2012imagenet}. In language, RNNs~\citep{elman1990finding},
+LSTMs~\citep{hochreiter1997long}, Transformers~\citep{vaswani2017attention},
+BERT~\citep{devlin2019bert}, and the GPT series~\citep{brown2020language} answered, in turn,
+sequential recurrence, long-range dependence, parallelizable attention, pretraining, and
+scale. In generative modeling, GANs~\citep{goodfellow2014generative},
+VAEs~\citep{kingma2014autoencoding}, and diffusion
+models~\citep{sohldickstein2015deep, ho2020denoising} came from adversarial training,
+variational inference, and stepwise noising and denoising. Each model has a local
+motivation, yet these local reasons do not add up to a systematic methodology for building
+models. A new architecture is usually proposed under a specific bottleneck, a modeling
+intuition, or benchmark pressure, and then filtered by data scale, compute, training
+stability, benchmark numbers, and community reuse~\citep{lipton2018troubling}. The gap is in
+model discovery, not model design. Design has clear reasons; discovery has no systematic
+space of candidates to draw from. Where a candidate structure comes from, which tasks it
+should be tried on first, and how its failure boundaries accumulate all tend to rely on
+individual experience and community trial and error~\citep{elsken2019neural}. In practice,
+building a model still means editing an existing architecture, porting a familiar structure
+to a new setting, or assembling a design by intuition and handing it to a
+benchmark~\citep{he2021automl,radosavovic2020designing}. What is missing is a library of
+candidate structures that lets us select and try models systematically and turn the
+modeling process into engineering; more one-off inspiration would not fill that gap.
+
+This is the gap the research program behind this paper aims at. Machine learning today does
+not lack model families. Tree-based models stay strong on many tabular
+tasks~\citep{grinsztajn2022tree}, CNNs still serve a large range of vision and spatial
+problems, and Transformers and diffusion models carry the mainstream of language and
+generation. In science, domain models from protein structure prediction (AlphaFold,
+RoseTTAFold) to weather forecasting (GraphCast) show how much a structural prior can decide a
+specific scientific task~\citep{jumper2021highly,baek2021accurate,lam2023learning}. This
+coexistence of many families points to a different question: how to generate, select, and
+accumulate candidate structures systematically when a new task appears, rather than how to
+propose one more model. The current ecosystem mostly stores results that have already been
+invented and validated, instead of a mechanism for generating and selecting candidates for
+future tasks. The match between a model and a task is likewise scattered across papers,
+leaderboards, community lore, and individual
+intuition~\citep{lipton2018troubling,elsken2019neural,he2021automl,radosavovic2020designing}.
+What we ultimately want to build is an infrastructure of candidate spaces for model
+discovery, not a list of model names, a model zoo, or a leaderboard. Such a library has to
+record three things: where a candidate structure comes from, what task features it suits,
+and where it fails. Once this information can be searched, compared, and accumulated, model
+discovery grows into a reusable, comparable, and extensible engineering process.
+
+Our proposal is that \textbf{physics itself is such a library of candidate models, open to
+systematic mining}. Physics has inspired neural networks before. The clearest early line
+runs through statistical physics: the energy function, state flips, and low-energy structure
+of the Ising model and spin glasses directly inspired the Hopfield network, and the Boltzmann
+distribution and thermal-equilibrium picture entered the Boltzmann machine and the restricted
+Boltzmann machine~\citep{hopfield1982neural,hinton1985learning,smolensky1986information}. The
+physics here is not decorative analogy; it entered the network itself as energy functions,
+probability distributions, and sampling mechanisms. That line also exposed a typical limit of
+physics-inspired models: energy models are often hard to train and expensive to sample, and
+they do not scale naturally to large data and modern deep architectures. Physical inspiration
+does not automatically yield a working architecture; it has to be re-engineered and then prove
+its advantage on a concrete task.
+
+Diffusion models are a more recent example. The idea first drew on the ``add noise step by
+step, then reverse'' picture from non-equilibrium thermodynamics, writing generative modeling
+as a process from data to noise and back~\citep{sohldickstein2015deep}. After later
+simplification and engineering, that physical picture became the standard training and
+sampling procedure of today's deep generative models~\citep{ho2020denoising}. The physics
+label can recede into the background as the method matures, while the process structure it
+supplied stays in place. Beyond this, symmetry and equivariance inspired CNNs, GNNs, and
+geometric deep learning, and Hamiltonian or oscillator structure has been used for dynamical
+systems and long-range sequence
+modeling~\citep{bronstein2021geometric,greydanus2019hamiltonian,rusch2021coupled,rusch2024oscillatory}.
+Physics has entered neural networks many times, as energy, distributions, dynamical
+processes, symmetry, and structural constraints.
+
+These successes did not follow one clean path. The Ising-and-Boltzmann-machine line
+contributed core concepts to deep learning, such as energy models and stochastic units, yet
+as a directly trainable, deployable architecture it did not grow into today's deep learning
+backbone. Diffusion models tell a different story: the physical idea was proposed by
+Sohl-Dickstein et al.\ as early as 2015~\citep{sohldickstein2015deep}, stayed quiet for
+several years, and was reactivated around 2020 by the engineering of DDPM and related
+work~\citep{ho2020denoising} to become mainstream in generative modeling. This history shows
+that the value of a physics model to AI is not an abstract ``useful'' or ``useless''; it
+depends on whether the model can be rewritten into a trainable structure, whether it matches
+some class of tasks, and where its failure boundary lies.
+
+So the question we care about is not to add a few more examples of physics inspiring AI, but
+whether we can make one thing systematic: take a physics model, especially the many mature
+many-body models physics offers, as a source of candidate structures; rewrite it into a
+trainable network; let it learn directly from task data, as a physics model turned into a
+learning engine; then test it on tasks, and record what it suits and where it fails. Put
+differently, the ``trial-and-error search for a model'' that once relied on scattered
+individual intuition becomes a process of sourcing candidates from physics and testing them
+systematically. Physics happens to supply the raw material for this. The Ising model, the
+Boltzmann distribution, and non-equilibrium diffusion mentioned above use only a small part
+of the physics toolbox; beyond them, physics has accumulated many mature models and
+mathematical skeletons, including integrable systems, open systems, many-body interactions,
+conservation laws, symplectic structure, reaction-diffusion, and multiscale theory. Many-body
+models in particular form a large and organized supply of candidate structures (Appendix~\ref{app:catalog}
+collects these physics families with their corresponding AI capabilities and maturity in one
+table). The real question follows: can these models form a library of candidate models for AI?
+Can we answer, in a standardized way and one by one, what state space each corresponds to, how
+it becomes a trainable network, what task it suits, where its advantage over existing models
+lies, and under what conditions it fails?
+
+This paper does not try to build that whole program. It makes a proof of concept first. In this
+proof of concept we pick one physics model that has not been used in deep learning before, turn
+it into a trainable network, put it on a benchmark, and see under what conditions it is actually
+useful, and even more useful than the currently dominant deep learning models, so that the
+questions above get answered once on one concrete model. Along the way we start from the
+physical structure, design a task that genuinely tests its structural advantage, use control
+audits to rule out hard-coding and bolt-on shortcuts, and mark its capability boundary. The
+first entry we mine is the \textbf{integrable / reversible system}. Its relevance is not
+``using AI to solve physics problems'', but that it offers an unusual prototype of sequence
+interaction: the system can undergo strong nonlinear interaction while the interaction content
+is preserved \emph{exactly} (solitons collide, pass through, and shift phase, and their
+amplitude content stays intact). A generic neural sequence model, by contrast, can learn
+approximate dynamics, but under long composition and length extrapolation a small per-step
+error accumulates, and the conserved quantities, reversibility, and richer structural content
+drift. So the real test is not whether a hard-coded integrable rule, treated as a model, can
+extrapolate (that is circular), but rather: \textbf{can a neural model that carries an
+integrable inductive bias, yet still has to learn the key rule from data, learn the interaction
+content that neither a generic model nor a bolt-on constraint can reach?}
+
+Our proof of concept lands on the \textbf{finite-carrier Box-Ball System}. A plain Box-Ball
+System leaks easily to hard-coding: a fixed rule that ignores the carrier already solves the
+task. Once the carrier capacity is limited to $K$, the rule becomes nontrivial: when the
+carrier is full, a ball has to pass through, and the correct drop decision has to use the
+carrier state. We also go beyond ball-count conservation and evaluate the \textbf{soliton-amplitude
+content}, the multiset of soliton amplitudes. It runs deeper than the ball count, because the
+same ball count can decompose into different amplitudes (for example $\{5,3,1\}$ and $\{4,4,1\}$
+are both $9$ balls), so bolting ball-count conservation onto any model cannot recover it. On the
+task with $K=3$ and composition $T=8$, the model that builds in this integrable carrier structure
+reaches $100\pm0\%$ per-cell accuracy, ball-count conservation, and amplitude-content preservation
+across $5$ random seeds. The two audits give the key evidence: replacing the learnable emit gate
+with a fixed rule drops amplitude content to $40\pm3\%$, so the $60$-point advantage comes from
+learning rather than hard-coding; projecting a generic model's output onto the correct ball count
+lifts ball-count conservation to $100\%$ but leaves amplitude content at $0.7\pm0.8\%$, so the
+advantage is not something a scalar conservation constraint can reproduce (Table~\ref{tab:tier1}).
+We mark the boundary at the same time: this is a positive result on a \textbf{discrete} integrable
+system, not a full benchmark family; on the smooth continuous Toda lattice the same discriminating
+effect does not appear (\S\ref{sec:boundary}).
+
+The boundary with existing work needs stating. That ``recurrent / state-tracking models with a
+left-to-right sweep extrapolate in length while attention does not'' is an established
+result~\citep{liu2023transformers, merrill2023parallelism, merrill2024illusion}, and we do
+\emph{not} claim ``beating Transformers'' as a contribution; the Transformer is a structure-free
+reference here. Using physical structure as an inductive bias also has precedent (Hamiltonian
+networks~\citep{greydanus2019hamiltonian}, Lagrangian networks~\citep{cranmer2020lagrangian},
+invertible coupling networks~\citep{dinh2014nice, dinh2016density}), but those mostly treat
+physics as a \emph{target} or as a \emph{guarantee}. Our difference is to measure whether
+integrable structure lets a network \emph{learn} interaction content that neither a generic
+model nor a bolt-on constraint can reach, with the leak and bolt-on audits nailing down ``learned
+vs.\ hard-coded'' and ``structure vs.\ conservation''. The Box-Ball System is itself an
+established integrable object in mathematical physics~\citep{takahashi1990soliton}, but as far as
+we know no one has used it as a learnable sequence model and compared it against mainstream models
+under length / composition extrapolation.
+
+To sum up, this paper makes four contributions. (i) It turns the ``physics model library'' route
+into an end-to-end, reproducible, cheat-resistant machine-learning case study rather than a
+manifesto. (ii) On the finite-carrier Box-Ball System it constructs a learnable model with
+integrable carrier structure and gives evidence that it preserves soliton-amplitude content
+exactly under long composition (\S\ref{sec:main}). (iii) It introduces the leak audit and the
+bolt-on control as two methodological guardrails, separating ``learned vs.\ hard-coded'' and
+``integrable content vs.\ scalar conservation'' (\S\ref{sec:setup:audits}). (iv) It states the
+boundary honestly: the result is limited to the discrete integrable case for now, and the
+continuous Toda negative result shows the mechanism does not transfer automatically
+(\S\ref{sec:boundary}).
+
+% ========================================================================
+\section{Background and setup}\label{sec:setup}
+% ========================================================================
+
+\subsection{The Box-Ball System and its finite-carrier variant}\label{sec:setup:bbs}
+The Box-Ball System (BBS) is a discrete integrable cellular automaton on a one-dimensional
+$0/1$ lattice: a \emph{carrier} sweeps from left to right, picking up balls it meets and
+dropping them into empty cells. A run of consecutive $1$s is a \textbf{soliton}; its amplitude
+equals the run length, it moves right at a speed proportional to its amplitude, and when a large
+soliton catches a small one it \emph{passes through} with each amplitude unchanged. The
+\textbf{finite-carrier Box-Ball System} caps the carrier capacity at $K$: when the carrier is
+full (holding $K$ balls), a ball it meets \emph{passes through} instead of being picked up. This
+change makes the single-step rule \emph{nontrivial}: the correct drop decision has to use the
+current carrier count, so a fixed rule that ignores the carrier cannot solve it (this is the basis
+of our leak audit, \S\ref{sec:setup:audits}).
+\textbf{TODO: add a single-step schematic or pseudocode for capacity $K$.}
+
+\subsection{Interaction content: an invariant richer than the ball count}\label{sec:setup:content}
+The total ball count is the shallowest conserved quantity, a scalar; it \emph{can} be bolted onto
+any model (\S\ref{sec:main}). The signature of integrability is much richer: the \textbf{multiset
+of soliton amplitudes} $\amp(x)=\{a_1\ge a_2\ge\cdots\}$ stays \emph{exactly invariant} under the
+dynamics, and it \textbf{cannot} be recovered from the ball count, since two states can share a
+ball count while differing in amplitude multiset (for example $\{5,3,1\}$ and $\{4,4,1\}$ are both
+$9$ balls). We use this multiset as the measure of whether the integrable interaction content has
+been preserved. It is read off by evolving the state until the solitons fully separate and reading
+the run lengths; we checked numerically that it is conserved under the finite-carrier dynamics and
+that the system is reversible ($K=2/4/6$).
+% Maturity: hard numerical (self-check passes).
+
+\subsection{Two audits: the honesty method for this paper}\label{sec:setup:audits}
+\begin{Definition}[leak audit / carrier-blind]\label{def:leak}
+Replace the \emph{learnable} emit gate in the structural model with a \emph{fixed} rule
+(\texttt{emit}$=1-$cell, untrained), keeping everything else. If the fixed version scores about the
+same as the learned one, the ``learning'' is empty and the advantage comes from hard-coding; if the
+fixed version is clearly worse, the advantage is \emph{genuinely learned}.
+\end{Definition}
+
+\begin{Definition}[bolt-on control]\label{def:bolton}
+Take a generic model and, at inference, \emph{project} its output onto the constraint ``same ball
+count as the input'' (keep the $N$ highest-probability cells, with $N=$ input ball count). This
+\emph{forces} the scalar conserved quantity onto the model. If it still fails to recover the
+interaction content, then that content \emph{cannot} be bolted on and is specific to the structure.
+\end{Definition}
+
+% ========================================================================
+\section{Main result: integrable extrapolation on the finite-carrier BBS (Tier 1)}\label{sec:main}
+% ========================================================================
+
+\paragraph{Task.}
+Learn \emph{one} finite-carrier BBS step, then \textbf{compose} it on multi-soliton states through
+many collisions (train on few, short solitons; test on many, long ones). We evaluate four quantities:
+per-cell accuracy, ball-count conservation, and the \emph{exact-match rate} and \emph{IoU} of the
+soliton-amplitude content. Entrants: the structural model (a conservation-respecting carrier sweep
+with a learnable emit gate, \S\ref{sec:setup:bbs}); generic models GRU / LSTM / Transformer; the
+bolt-on control (GRU $+$ ball-count projection, Definition~\ref{def:bolton}); and the leak audit
+(carrier-blind, Definition~\ref{def:leak}).
+
+\begin{table}[h]
+\centering
+\caption{Integrable-extrapolation leaderboard on the finite-carrier Box-Ball System ($K=3$,
+composition $T=8$ steps, $5$ random seeds, mean $\pm$ std). The structural model is $100\pm0$ on all
+four metrics; the leak audit reaches only $40\pm3$ amplitude content (a $60$-point learning margin,
+no leak); the bolt-on control pins the ball count at $100\%$ but recovers only $0.7\%$ amplitude
+content (conservation transfers, content does not).}
+\label{tab:tier1}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Entrant} & \textbf{Acc.\%} & \textbf{Ball-cons.\%} & \textbf{Amp.-exact\%} & \textbf{Amp.-IoU\%} \\
+\midrule
+\textbf{Structural carrier model} & $\mathbf{100.0\pm0.0}$ & $\mathbf{100.0\pm0.0}$ & $\mathbf{100.0\pm0.0}$ & $\mathbf{100.0\pm0.0}$ \\
+GRU (generic) & $91.7\pm1.2$ & $0.0\pm0.0$ & $0.0\pm0.0$ & $5.9\pm11.2$ \\
+LSTM (generic) & $92.7\pm1.3$ & $1.7\pm3.3$ & $0.0\pm0.0$ & $13.5\pm11.6$ \\
+Transformer (generic) & $71.6\pm10.9$ & $0.0\pm0.0$ & $0.0\pm0.0$ & $20.3\pm3.6$ \\
+Bolt-on (GRU $+$ pinned count) & $89.2\pm2.5$ & $100.0\pm0.0$ & $0.7\pm0.8$ & $21.8\pm5.3$ \\
+Leak audit (carrier-blind) & $88.9\pm0.5$ & $100.0\pm0.0$ & $40.0\pm3.2$ & $57.9\pm2.3$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{Result}[Learned, not hard-coded]\label{res:genuine}
+% Maturity: hard numerical (5 seeds). This is an empirical finding, not a theorem.
+The structural model's advantage is \emph{learned}: the leak audit (fixed emit gate) reaches only
+$40.0\pm3.2\%$ amplitude content, while the learned gate reaches $100\%$, a $60$-point learning
+margin. This is not the leak of the plain BBS (where the fixed rule also scores $100\%$); here the
+fixed rule is clearly worse, which shows the emit gate really did learn to use the carrier state.
+\end{Result}
+
+\begin{Result}[Deep, cannot be bolted on]\label{res:depth}
+% Maturity: hard numerical (5 seeds).
+Bolting the ball count onto a generic model lifts ball-count conservation to $100\%$, but recovers
+only $0.7\pm0.8\%$ amplitude content. The scalar conserved quantity can be bolted on; the soliton
+amplitude multiset cannot. \emph{Under the models, training budget, and evaluation protocol we test},
+only the model with integrable carrier structure keeps it, and the generic models (without bolt-on)
+collapse on both (amplitude content $0\%$).
+\end{Result}
+
+% ========================================================================
+\section{Mechanism}\label{sec:mechanism}
+% ========================================================================
+\textbf{TODO: main text.} Three points:
+(i) structural conservation (carrier bookkeeping) constrains the single-step rule to be
+conservative, so it can be learned \emph{exactly}, and composing it many times does not drift;
+(ii) a generic model only learns an approximate single step, and discrete composition amplifies the
+small error, losing content first and ball count later;
+(iii) a bolt-on only pins a scalar constraint and cannot pin the richer amplitude multiset (the
+amplitude pairing after collisions).
+
+% ========================================================================
+\section{Supporting experiments}\label{sec:support}
+% ========================================================================
+
+\subsection{Box-Ball (finite-carrier): exactness beats free-form, conservation bolts on}\label{sec:support:bbs}
+% Maturity: hard numerical (multi-seed). See experiments/box_ball_learned_vs_transformer.
+In a length-extrapolation setting (train $L=32$, test up to $L=256$, $5$ seeds), the structural
+carrier model extrapolates exactly at $100\%$, while generic sweep models (GRU / LSTM / SSM) drift
+with length; the control that bolts conservation onto a free-form model can pin the conservation rate
+back to $100\%$, yet \emph{cannot} recover the accuracy (Table~\ref{tab:boxball}, a gap of $9$--$21$
+points). This confirms the core distinction of the main result: \textbf{conservation bolts on,
+exactness does not}.
+
+\begin{table}[h]
+\centering
+\caption{Finite-carrier Box-Ball ($K=6$) length extrapolation, per-cell accuracy / ball-count
+conservation at $L=256$ (OOD), $5$ seeds. The structural model is $100/100$; free-form models drift
+with length; the bolt-on control pins conservation back to $100$ but stays at $91$ accuracy (a $9$-point
+gap). The Transformer has no sweep prior and is a reference only. See
+\texttt{experiments/box\_ball\_learned\_vs\_transformer}.}
+\label{tab:boxball}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Entrant} & \textbf{Acc.\%} & \textbf{Ball-cons.\%} \\
+\midrule
+\textbf{Structural carrier model} & $\mathbf{100}$ & $\mathbf{100}$ \\
+LSTM (free-form) & $91$ & $6$ \\
+GRU (free-form) & $79$ & $0$ \\
+Transformer (reference) & $64$ & $0$ \\
+Bolt-on (LSTM $+$ pinned conservation) & $91$ & $100$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Margolus block automaton: the effect survives a different reversible backbone}\label{sec:support:margolus}
+% Maturity: hard numerical (multi-seed + bolt-on control). See experiments/margolus_block_ca.
+The same ``structural conservation $+$ composition'' recipe carries over to a structurally different
+reversible system (a Margolus block-partitioning CA, with no long-range carrier; the step count grows
+with length, $T\propto L$). Even when a free-form model learns the single step to $\sim99\%$, long
+composition collapses its conservation to $\sim0$ and its accuracy to chance; bolting conservation on
+pins the conservation rate back but still cannot recover the accuracy; the structural model stays
+$100/100$ throughout (Table~\ref{tab:margolus}). So the main result is not specific to the
+Box-Ball / carrier setting.
+
+\begin{table}[h]
+\centering
+\caption{Margolus block CA ($5$ seeds): single-step accuracy, and accuracy / conservation composed to
+$L=384$. The free-form models nearly saturate the single step, then collapse on conservation and drop
+to chance accuracy under long composition; the bolt-on control pins conservation back to $100$ without
+recovering accuracy; the structural block-CA is $100/100$ throughout. See
+\texttt{experiments/margolus\_block\_ca}.}
+\label{tab:margolus}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Entrant} & \textbf{Single-step acc.\%} & \textbf{Composed acc.\% ($L{=}384$)} & \textbf{Composed cons.\% ($L{=}384$)} \\
+\midrule
+\textbf{Structural block-CA} & $\mathbf{100}$ & $\mathbf{100}$ & $\mathbf{100}$ \\
+bi-LSTM (free-form) & $98.7$ & $53$ & $1$ \\
+Transformer (free-form) & $99.7$ & $50$ & $0$ \\
+Bolt-on (bi-LSTM $+$ pinned cons.) & $98.7$ & $56$ & $100$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ========================================================================
+\section{Boundary: discrete $\to$ continuous does not transfer (Toda negative)}\label{sec:boundary}
+% ========================================================================
+% Maturity: numerical (negative result).
+The mechanism behind the discriminating effect in this paper \emph{depends on discreteness}. On the
+Toda lattice (genuinely integrable, but \textbf{smooth and continuous}), a free-form composing stepper
+\emph{already} solves the time-extrapolation task well enough (state error $\sim0.003$), so the
+structure has no gap to win: the small step of a smooth flow is captured exactly by the free-form
+model, composition does not accumulate, and there is no discriminating mechanism like the discrete
+BBS's ``off by a little each step, amplified to disaster as $T\propto L$''. We record Toda honestly as
+a negative result, and on that basis \textbf{restrict the claim of this paper to the discrete integrable
+case}. We also tried two ways to \emph{learn} the integrable structure (a learnable action-angle model
+and a Neural-Lax model); neither beat the bolt-on baseline in the continuous setting, and both are
+recorded as negative results (Appendix~\ref{app:negatives}).
+
+% ========================================================================
+\section{Related work}\label{sec:related}
+% ========================================================================
+\textbf{TODO: three layers, with the delta stated explicitly (see guardrail 1).}
+
+% ========================================================================
+\section{Discussion and outlook}\label{sec:outlook}
+% ========================================================================
+This paper gives a positive result on a discrete integrable system, cheat-resistant (two audits) and
+confirmed across multiple seeds: integrable structure lets a network learn interaction content that
+neither a generic model nor a bolt-on can reach. This is the first brick in grounding ``an integrable
+physics model as a learnable inductive bias'', not a complete benchmark family.
+\textbf{Outlook (deferred, not claimed here):} extend the validated Tier 1 into a family across several
+discrete integrable / reversible systems and capacities (including a colored Box-Ball System with
+labels, which makes the invariant richer); and the deeper question of making ``continuous integrable
+(KdV / Lax)'' learnable, which stays open (the Toda negative gives it an honest lower bound).
+
+\appendix
+% ========================================================================
+\section{A catalog of physics candidate model families (the mining map)}\label{app:catalog}
+% ========================================================================
+This appendix collects the ``physics library of candidate models'' from the main text into one table:
+for each physics family, its physical mechanism, the AI capability it might correspond to, and how far
+AI has already used it. Maturity has three levels: \emph{mature} (representative work exists),
+\emph{in progress} (some exploration, not yet mainstream), and \emph{potential} (a nearly blank,
+high-potential area). This paper mines the ``integrable systems'' entry.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{2.4cm}
+  >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X
+  >{\centering\arraybackslash}p{1.6cm} >{\raggedright\arraybackslash}X@{}}
+\toprule
+Physics family & Mechanism & Corresponding AI capability & Maturity & Status / representative direction \\
+\midrule
+Ising / spin glass & energy landscape, relaxation to the ground state & associative memory, denoising, energy models, generation & mature & Hopfield, Boltzmann machines; 2024 Nobel Prize in Physics \\
+Non-equilibrium thermo.\ / diffusion & noise then denoise, a diffusion process & generation (image, audio, \dots) & mature & diffusion / score-based models \\
+Symmetry / group equivariance & invariance and equivariance & geometric data, molecules, graphs & mature & equivariant networks, geometric deep learning \\
+Hamiltonian / oscillator & conserved state along time evolution & long-range sequence modeling & in progress & coRNN, UnICORNN, LinOSS (the SSM line) \\
+Renormalization group / coarse-graining & integrating out detail scale by scale & multiscale hierarchy, long-term memory & in progress & RG and deep-learning theory; RGMem, etc. \\
+Tensor networks / quantum many-body & matrix-product states compressing a wavefunction & compression, classification, generation & in progress & MPS/TT classification and generation (niche) \\
+Chaos / reservoir computing & dynamical systems at the edge of chaos & sequence prediction (nearly training-free) & in progress & reservoir computing / ESN \\
+\textbf{Integrable systems} & \textbf{infinitely many conserved quantities, solitons, exact reversibility} & \textbf{length extrapolation, conserved / reversible sequences, crosstalk-free channels} & \textbf{potential} & \textbf{the first entry mined here (integrable / reversible)} \\
+Lindblad / open quantum systems & evolution driven by dissipation and noise together & to be explored (noisy reasoning?) & potential & blank \\
+KPZ / surface growth & random growth with scaling laws & to be explored (generation? scaling structure?) & potential & blank \\
+Hubbard / Heisenberg & strongly correlated many-body & to be explored & potential & blank \\
+\bottomrule
+\end{tabularx}
+\caption{The ``mining map'' of physics candidate model families. The rows marked ``potential'' are the
+targets this project cares about most; we claim the integrable-systems entry first.}
+\label{tab:catalog}
+\end{table}
+
+% ========================================================================
+\section{Soliton-amplitude content: extraction protocol and self-check}\label{app:metric}
+% ========================================================================
+The amplitude content $\amp(x)$ is computed by a fixed protocol, applied the \emph{same} way to the
+ground truth and to model predictions:
+
+\begin{enumerate}
+\item \textbf{Evolve to separation, read run lengths.} Pad the state with enough zeros on the right and
+      evolve it under the finite-carrier dynamics until the solitons fully separate; the criterion is
+      that the multiset of run lengths stays \emph{unchanged} after $\Delta$ more steps. Then read the
+      length of each run of consecutive $1$s to get the sorted multiset. The step count needed for
+      separation starts at $2|x|+60$ and doubles until it stabilizes.
+\item \textbf{Padding amount (safety bound).} Under an unbounded carrier the rightmost ball moves right
+      by at most ``total ball count'' cells per step, so the padding is set to
+      $(\text{steps})\times(\text{total balls})+|x|+10$, which keeps the state within the right boundary.
+\item \textbf{Handling garbage states.} A model prediction can be an illegal state (wrong ball count, no
+      soliton structure). To avoid the pathological cost of a state that ``never separates'', we return
+      the current best estimate after at most $4$ doublings. This is applied to all entrants and
+      introduces no bias.
+\item \textbf{No bias toward the structural model (key).} The extractor is \emph{discriminating}, not
+      uniformly lenient: it gives $0\%$ to garbage output (generic models), $\sim40\%$ to partially
+      correct output (the fixed rule), and $100\%$ to fully correct output (the structural model). Three
+      clear levels show that it measures ``whether the soliton structure was actually preserved'', not a
+      mechanical favoring of one side.
+\end{enumerate}
+
+\paragraph{Self-check coverage.} We verified that $\amp$ is \emph{conserved} under the finite-carrier
+dynamics and that the system is \emph{reversible} (mirror method), across capacities $K=2,4,6$ with
+several random multi-soliton configurations each (including cases with amplitude above $K$, which trigger
+pass-through); the textbook $\{5,3,1\}$ configuration keeps amplitude content $\{5,3,1\}$ and ball count
+$9$ under the dynamics.
+% Maturity: hard numerical (self-check passes).
+
+% ========================================================================
+\section{Negative results from scouting (an honest memo)}\label{app:negatives}
+% ========================================================================
+\textbf{TODO: three parts.}
+(i) \emph{Plain BBS / multi-soliton leak}: without a capacity limit the structural model's emit gate is
+trivial (the fixed \texttt{emit}$=1-$cell already scores $100\%$), so we moved to finite capacity to get
+a nontrivial, genuinely learned gate;
+(ii) \emph{Colored BBS rule is not reversible}: the naive colored carrier rule is only $\sim86\%$
+reversible under the natural mirror inverse, so it is not a canonical integrable rule and needs a crystal
+/ combinatorial-$R$ construction; we defer the colored case to a future Tier 2;
+(iii) \emph{Two Toda attempts} (action-angle, Neural-Lax): on a continuous system the free-form model
+already solves it and the structure has no gap.
+
+% ========================================================================
+% Bibliography
+% ========================================================================
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}
